@@ -305,33 +305,11 @@ button {
   accent-color: var(--accent);
 }
 
-.setting-source {
-  min-height: calc(25px * var(--ui-scale));
-  margin-top: calc(1px * var(--ui-scale));
-  padding-top: calc(3px * var(--ui-scale));
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.setting-source select {
-  width: calc(92px * var(--ui-scale));
-  height: calc(20px * var(--ui-scale));
-  padding: 0 calc(6px * var(--ui-scale));
-  color: var(--text);
-  background: #29323a;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: calc(6px * var(--ui-scale));
-  font: inherit;
-}
-
-.setting-source select:disabled {
-  opacity: 0.5;
-}
-
 .content {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: calc(78px * var(--ui-scale)) 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: calc(8px * var(--ui-scale));
   align-items: start;
   flex: 1;
@@ -343,10 +321,19 @@ button {
   grid-template-columns: 1fr;
 }
 
+.liquid-meters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(5px * var(--ui-scale));
+  min-width: 0;
+  height: 100%;
+}
+
 .liquid-meter {
   position: relative;
-  width: calc(78px * var(--ui-scale));
+  width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: calc(96px * var(--ui-scale));
   overflow: hidden;
   border-radius: calc(16px * var(--ui-scale)) calc(16px * var(--ui-scale)) calc(26px * var(--ui-scale)) calc(26px * var(--ui-scale));
@@ -430,7 +417,7 @@ button {
 }
 
 .meter-copy strong {
-  font-size: calc(26px * var(--ui-scale));
+  font-size: calc(21px * var(--ui-scale));
   line-height: 1;
 }
 

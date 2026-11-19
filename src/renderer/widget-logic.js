@@ -6,8 +6,7 @@
   const DEFAULT_DISPLAY_SETTINGS = Object.freeze({
     showFiveHour: true,
     showWeekly: true,
-    showLiquid: true,
-    liquidSource: "weekly"
+    showLiquid: true
   });
 
   function normalizeDisplaySettings(value) {
@@ -15,8 +14,7 @@
     return {
       showFiveHour: settings.showFiveHour !== false,
       showWeekly: settings.showWeekly !== false,
-      showLiquid: settings.showLiquid !== false,
-      liquidSource: settings.liquidSource === "fiveHour" ? "fiveHour" : "weekly"
+      showLiquid: settings.showLiquid !== false
     };
   }
 

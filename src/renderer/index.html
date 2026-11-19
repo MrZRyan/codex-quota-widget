@@ -57,26 +57,33 @@
           <span id="showLiquidLabel">水位显示</span>
           <input id="showLiquidInput" type="checkbox" checked />
         </label>
-        <label class="setting-source">
-          <span id="liquidSourceLabel">水位代表</span>
-          <select id="liquidSourceInput">
-            <option id="liquidFiveHourOption" value="fiveHour">5小时额度</option>
-            <option id="liquidWeeklyOption" value="weekly" selected>7天额度</option>
-          </select>
-        </label>
       </aside>
 
       <section class="content">
-        <div id="liquidMeter" class="liquid-meter" aria-label="ChatGPT Quota 剩余额度">
-          <div class="glass-rim"></div>
-          <div id="liquidFill" class="liquid-fill">
-            <div class="wave wave-one"></div>
-            <div class="wave wave-two"></div>
+        <div class="liquid-meters">
+          <div id="fiveHourMeter" class="liquid-meter" role="img" aria-label="5小时剩余">
+            <div class="glass-rim"></div>
+            <div id="fiveHourFill" class="liquid-fill">
+              <div class="wave wave-one"></div>
+              <div class="wave wave-two"></div>
+            </div>
+            <div class="shine"></div>
+            <div class="meter-copy">
+              <strong id="fiveHourPercent">--%</strong>
+              <span id="fiveHourMeterLabel">5小时</span>
+            </div>
           </div>
-          <div class="shine"></div>
-          <div class="meter-copy">
-            <strong id="remaining">--%</strong>
-            <span id="remainingLabel">剩余</span>
+          <div id="weeklyMeter" class="liquid-meter" role="img" aria-label="7天剩余">
+            <div class="glass-rim"></div>
+            <div id="weeklyFill" class="liquid-fill">
+              <div class="wave wave-one"></div>
+              <div class="wave wave-two"></div>
+            </div>
+            <div class="shine"></div>
+            <div class="meter-copy">
+              <strong id="weeklyPercent">--%</strong>
+              <span id="weeklyMeterLabel">7天</span>
+            </div>
           </div>
         </div>
 

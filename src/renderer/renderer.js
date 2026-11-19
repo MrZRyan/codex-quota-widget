@@ -28,7 +28,6 @@ const i18n = {
     showFiveHour: "5\u5c0f\u65f6\u989d\u5ea6",
     showWeekly: "7\u5929\u989d\u5ea6",
     showLiquid: "\u6c34\u4f4d\u663e\u793a",
-    liquidSource: "\u6c34\u4f4d\u4ee3\u8868",
     fiveHourRemaining: "5\u5c0f\u65f6\u5269\u4f59",
     weeklyRemaining: "7\u5929\u5269\u4f59",
     codexNotFound: "\u672a\u627e\u5230 Codex\uff0c\u8bf7\u5148\u5b89\u88c5\u6216\u542f\u52a8 Codex",
@@ -67,7 +66,6 @@ const i18n = {
     showFiveHour: "5-hour quota",
     showWeekly: "7-day quota",
     showLiquid: "Liquid meter",
-    liquidSource: "Meter shows",
     fiveHourRemaining: "5h left",
     weeklyRemaining: "7d left",
     codexNotFound: "Codex was not found. Install or start Codex first.",
@@ -106,22 +104,23 @@ const elements = {
   showFiveHourLabel: $("showFiveHourLabel"),
   showWeeklyLabel: $("showWeeklyLabel"),
   showLiquidLabel: $("showLiquidLabel"),
-  liquidSourceLabel: $("liquidSourceLabel"),
   showFiveHourInput: $("showFiveHourInput"),
   showWeeklyInput: $("showWeeklyInput"),
   showLiquidInput: $("showLiquidInput"),
-  liquidSourceInput: $("liquidSourceInput"),
-  liquidFiveHourOption: $("liquidFiveHourOption"),
-  liquidWeeklyOption: $("liquidWeeklyOption"),
   pinBtn: $("pinBtn"),
   refreshBtn: $("refreshBtn"),
   minimizeBtn: $("minimizeBtn"),
   closeBtn: $("closeBtn"),
   content: document.querySelector(".content"),
-  liquidMeter: $("liquidMeter"),
-  liquidFill: $("liquidFill"),
-  remaining: $("remaining"),
-  remainingLabel: $("remainingLabel"),
+  liquidMeters: document.querySelector(".liquid-meters"),
+  fiveHourMeter: $("fiveHourMeter"),
+  fiveHourFill: $("fiveHourFill"),
+  fiveHourPercent: $("fiveHourPercent"),
+  fiveHourMeterLabel: $("fiveHourMeterLabel"),
+  weeklyMeter: $("weeklyMeter"),
+  weeklyFill: $("weeklyFill"),
+  weeklyPercent: $("weeklyPercent"),
+  weeklyMeterLabel: $("weeklyMeterLabel"),
   fiveHourCard: $("fiveHourCard"),
   fiveHourLabel: $("fiveHourLabel"),
   fiveHourText: $("fiveHourText"),
@@ -165,12 +164,11 @@ async function refreshQuota() {
 
 function render() {
   const quota = state.quota;
-  const selectedWindow = state.displaySettings.liquidSource === "fiveHour" ? quota?.fiveHour : quota?.weekly;
-  const percent = selectedWindow?.remainingPercent;
   const healthLevel = state.loading ? "loading" : state.error ? "error" : "ready";
-  const liquidLevel = window.WidgetLogic.getLevel(percent, null, false);
-  const fiveHourLevel = window.WidgetLogic.getLevel(quota?.fiveHour?.remainingPercent, null, false);
-  const weeklyLevel = window.WidgetLogic.getLevel(quota?.weekly?.remainingPercent, null, false);
+  const fiveHourPercent = quota?.fiveHour?.remainingPercent;
+  const weeklyPercent = quota?.weekly?.remainingPercent;
+  const fiveHourLevel = window.WidgetLogic.getLevel(fiveHourPercent, null, false);
+  const weeklyLevel = window.WidgetLogic.getLevel(weeklyPercent, null, false);
 
   elements.body.dataset.state = healthLevel;
   elements.brandName.textContent = "ChatGPT Quota";
@@ -183,12 +181,10 @@ function render() {
   elements.showFiveHourLabel.textContent = t("showFiveHour");
   elements.showWeeklyLabel.textContent = t("showWeekly");
   elements.showLiquidLabel.textContent = t("showLiquid");
-  elements.liquidSourceLabel.textContent = t("liquidSource");
-  elements.liquidFiveHourOption.textContent = t("showFiveHour");
-  elements.liquidWeeklyOption.textContent = t("showWeekly");
-  elements.remainingLabel.textContent = state.displaySettings.liquidSource === "fiveHour" ? t("fiveHourRemaining") : t("weeklyRemaining");
   elements.fiveHourLabel.textContent = t("fiveHour");
   elements.weeklyLabel.textContent = t("weekly");
+  elements.fiveHourMeterLabel.textContent = t("fiveHour");
+  elements.weeklyMeterLabel.textContent = t("weekly");
   elements.planLabel.textContent = t("plan");
   elements.todayTokenLabel.textContent = t("todayTokens");
 
@@ -217,9 +213,14 @@ function render() {
     elements.statusText.title = "";
   }
 
-  elements.remaining.textContent = typeof percent === "number" ? `${percent}%` : "--%";
-  elements.liquidFill.style.height = `${typeof percent === "number" ? percent : 0}%`;
-  elements.liquidMeter.dataset.level = liquidLevel;
+  elements.fiveHourPercent.textContent = typeof fiveHourPercent === "number" ? `${fiveHourPercent}%` : "--%";
+  elements.fiveHourFill.style.height = `${typeof fiveHourPercent === "number" ? fiveHourPercent : 0}%`;
+  elements.fiveHourMeter.dataset.level = fiveHourLevel;
+  elements.fiveHourMeter.setAttribute("aria-label", `${t("fiveHourRemaining")} ${elements.fiveHourPercent.textContent}`);
+  elements.weeklyPercent.textContent = typeof weeklyPercent === "number" ? `${weeklyPercent}%` : "--%";
+  elements.weeklyFill.style.height = `${typeof weeklyPercent === "number" ? weeklyPercent : 0}%`;
+  elements.weeklyMeter.dataset.level = weeklyLevel;
+  elements.weeklyMeter.setAttribute("aria-label", `${t("weeklyRemaining")} ${elements.weeklyPercent.textContent}`);
   elements.fiveHourCard.dataset.level = fiveHourLevel;
   elements.weeklyCard.dataset.level = weeklyLevel;
   elements.fiveHourText.textContent = formatWindow(quota?.fiveHour);
@@ -228,16 +229,13 @@ function render() {
   elements.todayTokenText.textContent = formatTokens(quota?.todayTokens);
   elements.todayTokenText.title = formatTokenTitle(quota?.todayTokens);
 
-  elements.liquidMeter.hidden = !state.displaySettings.showLiquid;
+  elements.liquidMeters.hidden = !state.displaySettings.showLiquid;
   elements.fiveHourCard.hidden = !state.displaySettings.showFiveHour;
   elements.weeklyCard.hidden = !state.displaySettings.showWeekly;
   elements.content.classList.toggle("no-meter", !state.displaySettings.showLiquid);
   elements.showFiveHourInput.checked = state.displaySettings.showFiveHour;
   elements.showWeeklyInput.checked = state.displaySettings.showWeekly;
   elements.showLiquidInput.checked = state.displaySettings.showLiquid;
-  elements.liquidSourceInput.value = state.displaySettings.liquidSource;
-  elements.liquidSourceInput.disabled = !state.displaySettings.showLiquid;
-  elements.liquidMeter.setAttribute("aria-label", elements.remainingLabel.textContent);
 }
 
 function loadDisplaySettings() {
@@ -256,8 +254,7 @@ function updateDisplaySettings() {
   state.displaySettings = window.WidgetLogic.normalizeDisplaySettings({
     showFiveHour: elements.showFiveHourInput.checked,
     showWeekly: elements.showWeeklyInput.checked,
-    showLiquid: elements.showLiquidInput.checked,
-    liquidSource: elements.liquidSourceInput.value
+    showLiquid: elements.showLiquidInput.checked
   });
   saveDisplaySettings();
   render();
@@ -355,7 +352,6 @@ function wireEvents() {
   elements.showFiveHourInput.addEventListener("change", updateDisplaySettings);
   elements.showWeeklyInput.addEventListener("change", updateDisplaySettings);
   elements.showLiquidInput.addEventListener("change", updateDisplaySettings);
-  elements.liquidSourceInput.addEventListener("change", updateDisplaySettings);
   document.addEventListener("pointerdown", (event) => {
     if (elements.settingsPanel.hidden) return;
     if (elements.settingsPanel.contains(event.target) || elements.settingsBtn.contains(event.target)) return;

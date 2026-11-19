@@ -2,23 +2,21 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { DEFAULT_DISPLAY_SETTINGS, normalizeDisplaySettings, getLevel } = require("../src/renderer/widget-logic");
 
-test("display settings default to all quota visuals with weekly liquid", () => {
+test("display settings default to all quota visuals", () => {
   assert.deepEqual(normalizeDisplaySettings(null), DEFAULT_DISPLAY_SETTINGS);
 });
 
-test("display settings preserve explicit hidden items and five-hour liquid", () => {
+test("display settings preserve explicit hidden items", () => {
   assert.deepEqual(
     normalizeDisplaySettings({
       showFiveHour: false,
       showWeekly: false,
-      showLiquid: false,
-      liquidSource: "fiveHour"
+      showLiquid: false
     }),
     {
       showFiveHour: false,
       showWeekly: false,
-      showLiquid: false,
-      liquidSource: "fiveHour"
+      showLiquid: false
     }
   );
 });
