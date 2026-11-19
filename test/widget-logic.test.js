@@ -13,13 +13,21 @@ test("display settings preserve hidden cards and meter sources", () => {
       showWeekly: false,
       showLiquid: false,
       meterOneSource: "none",
-      meterTwoSource: "fiveHour"
+      meterTwoSource: "fiveHour",
+      theme: "light",
+      barOrientation: "horizontal",
+      transparency: 35,
+      positionLocked: true
     }),
     {
       showFiveHour: false,
       showWeekly: false,
       meterOneSource: "none",
-      meterTwoSource: "fiveHour"
+      meterTwoSource: "fiveHour",
+      theme: "light",
+      barOrientation: "horizontal",
+      transparency: 35,
+      positionLocked: true
     }
   );
   assert.deepEqual(normalizeDisplaySettings({ showLiquid: false }), {

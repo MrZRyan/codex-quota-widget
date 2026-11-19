@@ -31,6 +31,15 @@ const i18n = {
     meterOneShows: "\u6c34\u4f4d 1 \u663e\u793a",
     meterTwoShows: "\u6c34\u4f4d 2 \u663e\u793a",
     none: "\u4e0d\u663e\u793a",
+    lockPosition: "\u9501\u5b9a\u4f4d\u7f6e",
+    unlockPosition: "\u89e3\u9501\u4f4d\u7f6e",
+    transparency: "\u900f\u660e\u5ea6",
+    theme: "\u4e3b\u9898",
+    darkTheme: "\u6df1\u8272",
+    lightTheme: "\u6d45\u8272",
+    orientation: "\u6761\u5f62\u56fe\u65b9\u5411",
+    vertical: "\u5782\u76f4",
+    horizontal: "\u6c34\u5e73",
     fiveHourRemaining: "5\u5c0f\u65f6\u5269\u4f59",
     weeklyRemaining: "7\u5929\u5269\u4f59",
     codexNotFound: "\u672a\u627e\u5230 Codex\uff0c\u8bf7\u5148\u5b89\u88c5\u6216\u542f\u52a8 Codex",
@@ -72,6 +81,15 @@ const i18n = {
     meterOneShows: "Meter 1 shows",
     meterTwoShows: "Meter 2 shows",
     none: "None",
+    lockPosition: "Lock position",
+    unlockPosition: "Unlock position",
+    transparency: "Transparency",
+    theme: "Theme",
+    darkTheme: "Dark",
+    lightTheme: "Light",
+    orientation: "Bar orientation",
+    vertical: "Vertical",
+    horizontal: "Horizontal",
     fiveHourRemaining: "5h left",
     weeklyRemaining: "7d left",
     codexNotFound: "Codex was not found. Install or start Codex first.",
@@ -111,14 +129,23 @@ const elements = {
   showWeeklyLabel: $("showWeeklyLabel"),
   meterOneSettingLabel: $("meterOneSettingLabel"),
   meterTwoSettingLabel: $("meterTwoSettingLabel"),
+  themeLabel: $("themeLabel"),
+  orientationLabel: $("orientationLabel"),
+  transparencyLabel: $("transparencyLabel"),
+  transparencyValue: $("transparencyValue"),
   showFiveHourInput: $("showFiveHourInput"),
   showWeeklyInput: $("showWeeklyInput"),
   meterOneSourceInput: $("meterOneSourceInput"),
   meterTwoSourceInput: $("meterTwoSourceInput"),
+  themeInput: $("themeInput"),
+  orientationInput: $("orientationInput"),
+  transparencyInput: $("transparencyInput"),
+  lockPositionBtn: $("lockPositionBtn"),
   pinBtn: $("pinBtn"),
   refreshBtn: $("refreshBtn"),
   minimizeBtn: $("minimizeBtn"),
   closeBtn: $("closeBtn"),
+  widget: document.querySelector(".widget"),
   content: document.querySelector(".content"),
   liquidMeters: document.querySelector(".liquid-meters"),
   meterOne: $("meterOne"),
@@ -189,6 +216,9 @@ function render() {
   const weeklyLevel = window.WidgetLogic.getLevel(quota?.weekly?.remainingPercent, null, false);
 
   elements.body.dataset.state = healthLevel;
+  elements.body.dataset.theme = state.displaySettings.theme;
+  elements.body.dataset.positionLocked = String(state.displaySettings.positionLocked);
+  elements.widget.style.opacity = String(1 - state.displaySettings.transparency / 100);
   elements.brandName.textContent = "ChatGPT Quota";
   elements.stateText.textContent = state.error ? t("readFailed") : t("readNormal");
   elements.langBtn.textContent = state.lang === "zh" ? "English" : "\u4e2d\u6587";
@@ -200,11 +230,10 @@ function render() {
   elements.showWeeklyLabel.textContent = t("showWeekly");
   elements.meterOneSettingLabel.textContent = t("meterOneShows");
   elements.meterTwoSettingLabel.textContent = t("meterTwoShows");
-  for (const select of [elements.meterOneSourceInput, elements.meterTwoSourceInput]) {
-    for (const option of select.options) {
-      option.textContent = t(option.value === "none" ? "none" : option.value === "weekly" ? "showWeekly" : "showFiveHour");
-    }
-  }
+  elements.themeLabel.textContent = t("theme");
+  elements.orientationLabel.textContent = t("orientation");
+  elements.transparencyLabel.textContent = t("transparency");
+  for (const option of document.querySelectorAll("option[data-i18n-key]")) option.textContent = t(option.dataset.i18nKey);
   elements.fiveHourLabel.textContent = t("fiveHour");
   elements.weeklyLabel.textContent = t("weekly");
   elements.meterOneLabel.textContent = t(meterOneSource);
@@ -240,11 +269,11 @@ function render() {
   }
 
   elements.meterOnePercent.textContent = typeof meterOnePercent === "number" ? `${meterOnePercent}%` : "--%";
-  elements.meterOneFill.style.height = `${typeof meterOnePercent === "number" ? meterOnePercent : 0}%`;
+  setMeterFill(elements.meterOneFill, meterOnePercent, state.displaySettings.barOrientation);
   elements.meterOne.dataset.level = meterOneLevel;
   elements.meterOne.setAttribute("aria-label", `${t(meterOneSource === "none" ? "none" : `${meterOneSource}Remaining`)} ${elements.meterOnePercent.textContent}, ${t("resetsIn")} ${meterOneReset}`);
   elements.meterTwoPercent.textContent = typeof meterTwoPercent === "number" ? `${meterTwoPercent}%` : "--%";
-  elements.meterTwoFill.style.height = `${typeof meterTwoPercent === "number" ? meterTwoPercent : 0}%`;
+  setMeterFill(elements.meterTwoFill, meterTwoPercent, state.displaySettings.barOrientation);
   elements.meterTwo.dataset.level = meterTwoLevel;
   elements.meterTwo.setAttribute("aria-label", `${t(meterTwoSource === "none" ? "none" : `${meterTwoSource}Remaining`)} ${elements.meterTwoPercent.textContent}, ${t("resetsIn")} ${meterTwoReset}`);
   elements.fiveHourCard.dataset.level = fiveHourLevel;
@@ -258,6 +287,7 @@ function render() {
   const meterOneVisible = meterOneSource !== "none";
   const meterTwoVisible = meterTwoSource !== "none";
   const hasMeters = meterOneVisible || meterTwoVisible;
+  elements.liquidMeters.dataset.orientation = state.displaySettings.barOrientation;
   elements.meterOne.hidden = !meterOneVisible;
   elements.meterTwo.hidden = !meterTwoVisible;
   elements.liquidMeters.hidden = !hasMeters;
@@ -269,6 +299,19 @@ function render() {
   elements.showWeeklyInput.checked = state.displaySettings.showWeekly;
   elements.meterOneSourceInput.value = meterOneSource;
   elements.meterTwoSourceInput.value = meterTwoSource;
+  elements.themeInput.value = state.displaySettings.theme;
+  elements.orientationInput.value = state.displaySettings.barOrientation;
+  elements.transparencyInput.value = state.displaySettings.transparency;
+  elements.transparencyValue.textContent = `${state.displaySettings.transparency}%`;
+  elements.lockPositionBtn.classList.toggle("active", state.displaySettings.positionLocked);
+  elements.lockPositionBtn.setAttribute("aria-pressed", String(state.displaySettings.positionLocked));
+  elements.lockPositionBtn.textContent = t(state.displaySettings.positionLocked ? "unlockPosition" : "lockPosition");
+}
+
+function setMeterFill(fill, percent, orientation) {
+  const value = typeof percent === "number" ? percent : 0;
+  fill.style.width = orientation === "horizontal" ? `${value}%` : "100%";
+  fill.style.height = orientation === "horizontal" ? "100%" : `${value}%`;
 }
 
 function loadDisplaySettings() {
@@ -285,10 +328,14 @@ function saveDisplaySettings() {
 
 function updateDisplaySettings() {
   state.displaySettings = window.WidgetLogic.normalizeDisplaySettings({
+    ...state.displaySettings,
     showFiveHour: elements.showFiveHourInput.checked,
     showWeekly: elements.showWeeklyInput.checked,
     meterOneSource: elements.meterOneSourceInput.value,
-    meterTwoSource: elements.meterTwoSourceInput.value
+    meterTwoSource: elements.meterTwoSourceInput.value,
+    theme: elements.themeInput.value,
+    barOrientation: elements.orientationInput.value,
+    transparency: Number(elements.transparencyInput.value)
   });
   saveDisplaySettings();
   render();
@@ -405,6 +452,14 @@ function wireEvents() {
   elements.showWeeklyInput.addEventListener("change", updateDisplaySettings);
   elements.meterOneSourceInput.addEventListener("change", updateDisplaySettings);
   elements.meterTwoSourceInput.addEventListener("change", updateDisplaySettings);
+  elements.themeInput.addEventListener("change", updateDisplaySettings);
+  elements.orientationInput.addEventListener("change", updateDisplaySettings);
+  elements.transparencyInput.addEventListener("input", updateDisplaySettings);
+  elements.lockPositionBtn.addEventListener("click", () => {
+    state.displaySettings.positionLocked = !state.displaySettings.positionLocked;
+    saveDisplaySettings();
+    render();
+  });
   document.addEventListener("pointerdown", (event) => {
     if (elements.settingsPanel.hidden) return;
     if (elements.settingsPanel.contains(event.target) || elements.settingsBtn.contains(event.target)) return;

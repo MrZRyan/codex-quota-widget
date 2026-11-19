@@ -12,6 +12,26 @@
   --danger-rgb: 255, 92, 92;
   --warn: #f2b84b;
   --warn-rgb: 242, 184, 75;
+  --settings-panel: rgba(18, 24, 30, 0.97);
+  --settings-line: rgba(255, 255, 255, 0.1);
+  --control-bg: rgba(255, 255, 255, 0.08);
+  --control-line: rgba(255, 255, 255, 0.09);
+  --meter-copy: rgba(255, 255, 255, 0.78);
+}
+
+body[data-theme="light"] {
+  color-scheme: light;
+  --panel: rgba(238, 244, 247, 0.9);
+  --line: rgba(31, 50, 62, 0.2);
+  --text: #1d303b;
+  --muted: #526873;
+  --accent: #12956d;
+  --accent-rgb: 18, 149, 109;
+  --settings-panel: rgba(247, 250, 251, 0.98);
+  --settings-line: rgba(31, 50, 62, 0.14);
+  --control-bg: rgba(31, 50, 62, 0.06);
+  --control-line: rgba(31, 50, 62, 0.14);
+  --meter-copy: rgba(29, 48, 59, 0.82);
 }
 
 * {
@@ -26,6 +46,7 @@ body {
   overflow: hidden;
   background: transparent;
   color: var(--text);
+  border-radius: calc(16px * var(--ui-scale));
 }
 
 button {
@@ -50,31 +71,9 @@ button {
     var(--panel);
   border: 1px solid var(--line);
   border-radius: calc(16px * var(--ui-scale));
-  backdrop-filter: blur(calc(8px * var(--ui-scale))) saturate(120%);
+  box-shadow: none;
+  filter: none;
   user-select: none;
-}
-
-.ambient {
-  position: absolute;
-  pointer-events: none;
-  opacity: 0.24;
-  filter: blur(calc(8px * var(--ui-scale)));
-}
-
-.ambient-a {
-  top: calc(-24px * var(--ui-scale));
-  right: calc(24px * var(--ui-scale));
-  width: calc(70px * var(--ui-scale));
-  height: calc(48px * var(--ui-scale));
-  background: rgba(var(--accent-rgb), 0.45);
-}
-
-.ambient-b {
-  bottom: calc(-20px * var(--ui-scale));
-  left: calc(10px * var(--ui-scale));
-  width: calc(70px * var(--ui-scale));
-  height: calc(42px * var(--ui-scale));
-  background: rgba(86, 176, 255, 0.24);
 }
 
 .titlebar {
@@ -86,6 +85,10 @@ button {
   gap: calc(6px * var(--ui-scale));
   min-height: calc(25px * var(--ui-scale));
   -webkit-app-region: drag;
+}
+
+body[data-position-locked="true"] .titlebar {
+  -webkit-app-region: no-drag;
 }
 
 .brand {
@@ -219,7 +222,7 @@ button {
 .text-button:focus-visible,
 .panel-action:focus-visible,
 .setting-row input:focus-visible,
-.meter-source select:focus-visible {
+.setting-row select:focus-visible {
   outline: 2px solid rgba(var(--accent-rgb), 0.9);
   outline-offset: 1px;
 }
@@ -233,16 +236,16 @@ button {
   max-height: calc(100vh - 45px * var(--ui-scale));
   padding: calc(7px * var(--ui-scale)) calc(8px * var(--ui-scale));
   overflow-y: auto;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--line);
   border-radius: calc(11px * var(--ui-scale));
-  background: rgba(18, 24, 30, 0.97);
+  background: var(--settings-panel);
   box-shadow: 0 calc(12px * var(--ui-scale)) calc(28px * var(--ui-scale)) rgba(0, 0, 0, 0.48), inset 0 1px rgba(255, 255, 255, 0.08);
   -webkit-app-region: no-drag;
 }
 
 .settings-heading {
   padding: 0 calc(2px * var(--ui-scale)) calc(5px * var(--ui-scale));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--settings-line);
 }
 
 .settings-heading strong,
@@ -263,7 +266,7 @@ button {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: calc(4px * var(--ui-scale));
   padding: calc(4px * var(--ui-scale)) 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--settings-line);
 }
 
 .panel-action {
@@ -272,8 +275,8 @@ button {
   padding: 0 calc(4px * var(--ui-scale));
   overflow: hidden;
   color: var(--text);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--control-bg);
+  border: 1px solid var(--control-line);
   border-radius: calc(6px * var(--ui-scale));
   font-size: calc(9px * var(--ui-scale));
   text-overflow: ellipsis;
@@ -304,15 +307,30 @@ button {
   accent-color: var(--accent);
 }
 
-.meter-source select {
+.setting-row select {
   width: calc(105px * var(--ui-scale));
   height: calc(20px * var(--ui-scale));
   padding: 0 calc(4px * var(--ui-scale));
   color: var(--text);
-  background: #29323a;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: var(--control-bg);
+  border: 1px solid var(--control-line);
   border-radius: calc(6px * var(--ui-scale));
   font: inherit;
+}
+
+.setting-row input[type="range"] {
+  width: calc(82px * var(--ui-scale));
+  height: calc(14px * var(--ui-scale));
+}
+
+.setting-row output {
+  min-width: calc(25px * var(--ui-scale));
+  text-align: right;
+}
+
+.lock-action {
+  width: 100%;
+  margin: calc(4px * var(--ui-scale)) 0;
 }
 
 .content {
@@ -341,6 +359,15 @@ button {
 
 .liquid-meters.single-meter {
   grid-template-columns: 1fr;
+}
+
+.liquid-meters[data-orientation="horizontal"] {
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.liquid-meters[data-orientation="horizontal"].single-meter {
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .liquid-meter {
@@ -380,7 +407,21 @@ button {
   height: 0%;
   min-height: calc(5px * var(--ui-scale));
   background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.75), rgba(var(--accent-rgb), 0.28));
-  transition: height 0.5s ease;
+  transition: width 0.5s ease, height 0.5s ease;
+}
+
+.liquid-meters[data-orientation="horizontal"] .liquid-meter {
+  min-height: calc(44px * var(--ui-scale));
+  border-radius: calc(12px * var(--ui-scale));
+}
+
+.liquid-meters[data-orientation="horizontal"] .liquid-fill {
+  top: 0;
+  right: auto;
+  bottom: 0;
+  height: 100%;
+  min-height: 0;
+  background: linear-gradient(90deg, rgba(var(--quota-rgb, 105, 183, 255), 0.34), rgba(var(--quota-rgb, 105, 183, 255), 0.82));
 }
 
 .liquid-meter[data-level="warning"] {
@@ -404,6 +445,10 @@ button {
   background: linear-gradient(180deg, rgba(var(--quota-rgb, 105, 183, 255), 0.82), rgba(var(--quota-rgb, 105, 183, 255), 0.34));
 }
 
+.liquid-meters[data-orientation="horizontal"] .liquid-meter .liquid-fill {
+  background: linear-gradient(90deg, rgba(var(--quota-rgb, 105, 183, 255), 0.34), rgba(var(--quota-rgb, 105, 183, 255), 0.82));
+}
+
 .wave {
   position: absolute;
   left: calc(-20px * var(--ui-scale));
@@ -418,6 +463,20 @@ button {
 .wave-two {
   opacity: 0.34;
   transform: translateX(calc(-8px * var(--ui-scale)));
+}
+
+.liquid-meters[data-orientation="horizontal"] .wave {
+  top: calc(-8px * var(--ui-scale));
+  right: calc(-8px * var(--ui-scale));
+  bottom: calc(-8px * var(--ui-scale));
+  left: auto;
+  width: calc(16px * var(--ui-scale));
+  height: auto;
+  transform: translateY(calc(8px * var(--ui-scale)));
+}
+
+.liquid-meters[data-orientation="horizontal"] .wave-two {
+  transform: translateY(calc(-8px * var(--ui-scale)));
 }
 
 .meter-copy {
@@ -435,7 +494,7 @@ button {
 }
 
 .meter-copy span {
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--meter-copy);
   font-size: calc(10px * var(--ui-scale));
 }
 
@@ -465,6 +524,25 @@ button {
   border-radius: calc(6px * var(--ui-scale));
   background: rgba(255, 255, 255, 0.075);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="light"] .quota-card {
+  background: rgba(31, 50, 62, 0.045);
+  border-color: rgba(31, 50, 62, 0.12);
+}
+
+body[data-theme="light"] .quota-card.primary {
+  background: rgba(var(--quota-rgb, 105, 183, 255), 0.12);
+  border-color: rgba(var(--quota-rgb, 105, 183, 255), 0.42);
+}
+
+body[data-theme="light"] .liquid-meter {
+  background: rgba(31, 50, 62, 0.055);
+  border-color: rgba(31, 50, 62, 0.2);
+}
+
+body[data-theme="light"] .meter-copy {
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.78);
 }
 
 .quota-card.primary {

@@ -9,9 +9,6 @@
   </head>
   <body data-state="loading">
     <main class="widget">
-      <div class="ambient ambient-a"></div>
-      <div class="ambient ambient-b"></div>
-
       <header class="titlebar">
         <div class="brand">
           <span id="trafficLight" class="traffic-light loading" aria-hidden="true"></span>
@@ -45,6 +42,7 @@
           <button id="pinBtn" class="panel-action active" type="button">取消置顶</button>
           <button id="langBtn" class="panel-action" type="button">English</button>
         </div>
+        <button id="lockPositionBtn" class="panel-action lock-action" type="button" aria-pressed="false">Lock position</button>
         <label class="setting-row">
           <span id="showFiveHourLabel">5小时额度</span>
           <input id="showFiveHourInput" type="checkbox" checked />
@@ -53,21 +51,40 @@
           <span id="showWeeklyLabel">7天额度</span>
           <input id="showWeeklyInput" type="checkbox" checked />
         </label>
-        <label class="setting-row meter-source">
+        <label class="setting-row setting-select">
           <span id="meterOneSettingLabel">Meter 1 shows</span>
           <select id="meterOneSourceInput">
-            <option value="none">None</option>
-            <option value="weekly">7-day quota</option>
-            <option value="fiveHour">5-hour quota</option>
+            <option value="none" data-i18n-key="none">None</option>
+            <option value="weekly" data-i18n-key="showWeekly">7-day quota</option>
+            <option value="fiveHour" data-i18n-key="showFiveHour">5-hour quota</option>
           </select>
         </label>
-        <label class="setting-row meter-source">
+        <label class="setting-row setting-select">
           <span id="meterTwoSettingLabel">Meter 2 shows</span>
           <select id="meterTwoSourceInput">
-            <option value="none">None</option>
-            <option value="weekly">7-day quota</option>
-            <option value="fiveHour">5-hour quota</option>
+            <option value="none" data-i18n-key="none">None</option>
+            <option value="weekly" data-i18n-key="showWeekly">7-day quota</option>
+            <option value="fiveHour" data-i18n-key="showFiveHour">5-hour quota</option>
           </select>
+        </label>
+        <label class="setting-row setting-select">
+          <span id="themeLabel">Theme</span>
+          <select id="themeInput">
+            <option value="dark" data-i18n-key="darkTheme">Dark</option>
+            <option value="light" data-i18n-key="lightTheme">Light</option>
+          </select>
+        </label>
+        <label class="setting-row setting-select">
+          <span id="orientationLabel">Bar orientation</span>
+          <select id="orientationInput">
+            <option value="vertical" data-i18n-key="vertical">Vertical</option>
+            <option value="horizontal" data-i18n-key="horizontal">Horizontal</option>
+          </select>
+        </label>
+        <label class="setting-row transparency-setting">
+          <span id="transparencyLabel">Transparency</span>
+          <input id="transparencyInput" type="range" min="0" max="60" step="5" value="0" />
+          <output id="transparencyValue">0%</output>
         </label>
       </aside>
 
