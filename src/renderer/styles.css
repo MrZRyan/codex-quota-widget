@@ -2,7 +2,7 @@
   --ui-scale: 1;
   color-scheme: dark;
   font-family: "Segoe UI", "Microsoft YaHei UI", system-ui, sans-serif;
-  --panel: rgba(15, 20, 25, 0.78);
+  --panel: #0f1419;
   --line: rgba(255, 255, 255, 0.16);
   --text: #f3f8fb;
   --muted: #aebbc5;
@@ -22,7 +22,7 @@
 
 body[data-theme="light"] {
   color-scheme: light;
-  --panel: rgba(238, 244, 247, 0.9);
+  --panel: #eef4f7;
   --line: rgba(31, 50, 62, 0.2);
   --text: #1d303b;
   --muted: #526873;
@@ -550,18 +550,33 @@ body[data-position-locked="true"] .titlebar {
 
 .quota-panel {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-auto-rows: minmax(calc(24px * var(--ui-scale)), 1fr);
   gap: calc(4px * var(--ui-scale));
   height: 100%;
+  container-type: inline-size;
+}
+
+.quota-card.primary {
+  grid-column: 1 / -1;
 }
 
 .content.horizontal-layout .quota-panel {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(calc(24px * var(--ui-scale)), 1fr));
   height: auto;
   flex: 1;
   min-height: 0;
+}
+
+.content.horizontal-layout .quota-card.primary {
+  grid-column: auto;
+}
+
+@container (max-width: 100px) {
+  .quota-card.slim,
+  .quota-card.token-card {
+    grid-column: 1 / -1;
+  }
 }
 
 .quota-card {

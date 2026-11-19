@@ -25,7 +25,7 @@
       meterTwoSource: normalizeMeterSource(settings.meterTwoSource, fallbackMeterSource || "weekly"),
       theme: settings.theme === "light" ? "light" : "dark",
       barOrientation: settings.barOrientation === "horizontal" ? "horizontal" : "vertical",
-      transparency: Number.isFinite(transparency) ? Math.round(Math.max(0, Math.min(60, transparency)) / 5) * 5 : 0,
+      transparency: Number.isFinite(transparency) ? Math.round(Math.max(0, Math.min(100, transparency)) / 5) * 5 : 0,
       positionLocked: settings.positionLocked === true
     };
   }
