@@ -356,6 +356,13 @@ body[data-position-locked="true"] .titlebar {
   grid-template-columns: 1fr;
 }
 
+.content.horizontal-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: calc(5px * var(--ui-scale));
+}
+
 .liquid-meters {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -370,11 +377,14 @@ body[data-position-locked="true"] .titlebar {
 
 .liquid-meters[data-orientation="horizontal"] {
   grid-template-columns: 1fr;
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, calc(32px * var(--ui-scale)));
+  width: 100%;
+  height: auto;
+  flex: 0 0 auto;
 }
 
 .liquid-meters[data-orientation="horizontal"].single-meter {
-  grid-template-rows: minmax(0, 1fr);
+  grid-template-rows: calc(32px * var(--ui-scale));
 }
 
 .liquid-meter {
@@ -418,7 +428,8 @@ body[data-position-locked="true"] .titlebar {
 }
 
 .liquid-meters[data-orientation="horizontal"] .liquid-meter {
-  min-height: calc(44px * var(--ui-scale));
+  height: calc(32px * var(--ui-scale));
+  min-height: calc(32px * var(--ui-scale));
   border-radius: calc(12px * var(--ui-scale));
 }
 
@@ -495,9 +506,20 @@ body[data-position-locked="true"] .titlebar {
   text-shadow: 0 calc(2px * var(--ui-scale)) calc(10px * var(--ui-scale)) rgba(0, 0, 0, 0.55);
 }
 
+.liquid-meters[data-orientation="horizontal"] .meter-copy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(6px * var(--ui-scale));
+}
+
 .meter-copy strong {
   font-size: calc(21px * var(--ui-scale));
   line-height: 1;
+}
+
+.liquid-meters[data-orientation="horizontal"] .meter-copy strong {
+  font-size: calc(15px * var(--ui-scale));
 }
 
 .meter-copy span {
@@ -511,10 +533,18 @@ body[data-position-locked="true"] .titlebar {
   line-height: 1;
 }
 
+.liquid-meters[data-orientation="horizontal"] .meter-copy .meter-window-label {
+  margin-bottom: 0;
+}
+
 .meter-copy .meter-reset {
   margin-top: calc(2px * var(--ui-scale));
   font-size: calc(8px * var(--ui-scale));
   white-space: nowrap;
+}
+
+.liquid-meters[data-orientation="horizontal"] .meter-copy .meter-reset {
+  margin-top: 0;
 }
 
 .quota-panel {
@@ -523,6 +553,14 @@ body[data-position-locked="true"] .titlebar {
   grid-auto-rows: minmax(calc(24px * var(--ui-scale)), 1fr);
   gap: calc(4px * var(--ui-scale));
   height: 100%;
+}
+
+.content.horizontal-layout .quota-panel {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(calc(24px * var(--ui-scale)), 1fr));
+  height: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .quota-card {

@@ -287,6 +287,7 @@ function render() {
   const meterOneVisible = meterOneSource !== "none";
   const meterTwoVisible = meterTwoSource !== "none";
   const hasMeters = meterOneVisible || meterTwoVisible;
+  const horizontalLayout = state.displaySettings.barOrientation === "horizontal" && hasMeters;
   elements.liquidMeters.dataset.orientation = state.displaySettings.barOrientation;
   elements.meterOne.hidden = !meterOneVisible;
   elements.meterTwo.hidden = !meterTwoVisible;
@@ -295,6 +296,7 @@ function render() {
   elements.fiveHourCard.hidden = !state.displaySettings.showFiveHour;
   elements.weeklyCard.hidden = !state.displaySettings.showWeekly;
   elements.content.classList.toggle("no-meter", !hasMeters);
+  elements.content.classList.toggle("horizontal-layout", horizontalLayout);
   elements.showFiveHourInput.checked = state.displaySettings.showFiveHour;
   elements.showWeeklyInput.checked = state.displaySettings.showWeekly;
   elements.meterOneSourceInput.value = meterOneSource;
