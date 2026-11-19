@@ -6,19 +6,27 @@ test("display settings default to all quota visuals", () => {
   assert.deepEqual(normalizeDisplaySettings(null), DEFAULT_DISPLAY_SETTINGS);
 });
 
-test("display settings preserve explicit hidden items", () => {
+test("display settings preserve hidden cards and meter sources", () => {
   assert.deepEqual(
     normalizeDisplaySettings({
       showFiveHour: false,
       showWeekly: false,
-      showLiquid: false
+      showLiquid: false,
+      meterOneSource: "none",
+      meterTwoSource: "fiveHour"
     }),
     {
       showFiveHour: false,
       showWeekly: false,
-      showLiquid: false
+      meterOneSource: "none",
+      meterTwoSource: "fiveHour"
     }
   );
+  assert.deepEqual(normalizeDisplaySettings({ showLiquid: false }), {
+    ...DEFAULT_DISPLAY_SETTINGS,
+    meterOneSource: "none",
+    meterTwoSource: "none"
+  });
 });
 
 test("quota thresholds are green at 40, amber from 20, and red below 20", () => {

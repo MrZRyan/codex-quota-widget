@@ -28,7 +28,9 @@ const i18n = {
     settingsHint: "\u5feb\u6377\u64cd\u4f5c\u4e0e\u663e\u793a\u8bbe\u7f6e",
     showFiveHour: "5\u5c0f\u65f6\u989d\u5ea6",
     showWeekly: "7\u5929\u989d\u5ea6",
-    showLiquid: "\u6c34\u4f4d\u663e\u793a",
+    meterOneShows: "\u6c34\u4f4d 1 \u663e\u793a",
+    meterTwoShows: "\u6c34\u4f4d 2 \u663e\u793a",
+    none: "\u4e0d\u663e\u793a",
     fiveHourRemaining: "5\u5c0f\u65f6\u5269\u4f59",
     weeklyRemaining: "7\u5929\u5269\u4f59",
     codexNotFound: "\u672a\u627e\u5230 Codex\uff0c\u8bf7\u5148\u5b89\u88c5\u6216\u542f\u52a8 Codex",
@@ -67,7 +69,9 @@ const i18n = {
     settingsHint: "Quick actions and display settings",
     showFiveHour: "5-hour quota",
     showWeekly: "7-day quota",
-    showLiquid: "Liquid meter",
+    meterOneShows: "Meter 1 shows",
+    meterTwoShows: "Meter 2 shows",
+    none: "None",
     fiveHourRemaining: "5h left",
     weeklyRemaining: "7d left",
     codexNotFound: "Codex was not found. Install or start Codex first.",
@@ -105,26 +109,28 @@ const elements = {
   settingsHint: $("settingsHint"),
   showFiveHourLabel: $("showFiveHourLabel"),
   showWeeklyLabel: $("showWeeklyLabel"),
-  showLiquidLabel: $("showLiquidLabel"),
+  meterOneSettingLabel: $("meterOneSettingLabel"),
+  meterTwoSettingLabel: $("meterTwoSettingLabel"),
   showFiveHourInput: $("showFiveHourInput"),
   showWeeklyInput: $("showWeeklyInput"),
-  showLiquidInput: $("showLiquidInput"),
+  meterOneSourceInput: $("meterOneSourceInput"),
+  meterTwoSourceInput: $("meterTwoSourceInput"),
   pinBtn: $("pinBtn"),
   refreshBtn: $("refreshBtn"),
   minimizeBtn: $("minimizeBtn"),
   closeBtn: $("closeBtn"),
   content: document.querySelector(".content"),
   liquidMeters: document.querySelector(".liquid-meters"),
-  fiveHourMeter: $("fiveHourMeter"),
-  fiveHourFill: $("fiveHourFill"),
-  fiveHourPercent: $("fiveHourPercent"),
-  fiveHourMeterLabel: $("fiveHourMeterLabel"),
-  fiveHourReset: $("fiveHourReset"),
-  weeklyMeter: $("weeklyMeter"),
-  weeklyFill: $("weeklyFill"),
-  weeklyPercent: $("weeklyPercent"),
-  weeklyMeterLabel: $("weeklyMeterLabel"),
-  weeklyReset: $("weeklyReset"),
+  meterOne: $("meterOne"),
+  meterOneFill: $("meterOneFill"),
+  meterOnePercent: $("meterOnePercent"),
+  meterOneLabel: $("meterOneLabel"),
+  meterOneReset: $("meterOneReset"),
+  meterTwo: $("meterTwo"),
+  meterTwoFill: $("meterTwoFill"),
+  meterTwoPercent: $("meterTwoPercent"),
+  meterTwoLabel: $("meterTwoLabel"),
+  meterTwoReset: $("meterTwoReset"),
   fiveHourCard: $("fiveHourCard"),
   fiveHourLabel: $("fiveHourLabel"),
   fiveHourText: $("fiveHourText"),
@@ -169,12 +175,18 @@ async function refreshQuota() {
 function render() {
   const quota = state.quota;
   const healthLevel = state.loading ? "loading" : state.error ? "error" : "ready";
-  const fiveHourPercent = quota?.fiveHour?.remainingPercent;
-  const weeklyPercent = quota?.weekly?.remainingPercent;
-  const fiveHourReset = formatTimeUntilReset(quota?.fiveHour?.resetsAt);
-  const weeklyReset = formatTimeUntilReset(quota?.weekly?.resetsAt);
-  const fiveHourLevel = window.WidgetLogic.getLevel(fiveHourPercent, null, false);
-  const weeklyLevel = window.WidgetLogic.getLevel(weeklyPercent, null, false);
+  const meterOneSource = state.displaySettings.meterOneSource;
+  const meterTwoSource = state.displaySettings.meterTwoSource;
+  const meterOneQuota = quota?.[meterOneSource];
+  const meterTwoQuota = quota?.[meterTwoSource];
+  const meterOnePercent = meterOneQuota?.remainingPercent;
+  const meterTwoPercent = meterTwoQuota?.remainingPercent;
+  const meterOneReset = formatTimeUntilReset(meterOneQuota?.resetsAt);
+  const meterTwoReset = formatTimeUntilReset(meterTwoQuota?.resetsAt);
+  const meterOneLevel = window.WidgetLogic.getLevel(meterOnePercent, null, false);
+  const meterTwoLevel = window.WidgetLogic.getLevel(meterTwoPercent, null, false);
+  const fiveHourLevel = window.WidgetLogic.getLevel(quota?.fiveHour?.remainingPercent, null, false);
+  const weeklyLevel = window.WidgetLogic.getLevel(quota?.weekly?.remainingPercent, null, false);
 
   elements.body.dataset.state = healthLevel;
   elements.brandName.textContent = "ChatGPT Quota";
@@ -186,13 +198,19 @@ function render() {
   elements.settingsHint.textContent = t("settingsHint");
   elements.showFiveHourLabel.textContent = t("showFiveHour");
   elements.showWeeklyLabel.textContent = t("showWeekly");
-  elements.showLiquidLabel.textContent = t("showLiquid");
+  elements.meterOneSettingLabel.textContent = t("meterOneShows");
+  elements.meterTwoSettingLabel.textContent = t("meterTwoShows");
+  for (const select of [elements.meterOneSourceInput, elements.meterTwoSourceInput]) {
+    for (const option of select.options) {
+      option.textContent = t(option.value === "none" ? "none" : option.value === "weekly" ? "showWeekly" : "showFiveHour");
+    }
+  }
   elements.fiveHourLabel.textContent = t("fiveHour");
   elements.weeklyLabel.textContent = t("weekly");
-  elements.fiveHourMeterLabel.textContent = t("fiveHour");
-  elements.weeklyMeterLabel.textContent = t("weekly");
-  elements.fiveHourReset.textContent = fiveHourReset;
-  elements.weeklyReset.textContent = weeklyReset;
+  elements.meterOneLabel.textContent = t(meterOneSource);
+  elements.meterOneReset.textContent = meterOneReset;
+  elements.meterTwoLabel.textContent = t(meterTwoSource);
+  elements.meterTwoReset.textContent = meterTwoReset;
   elements.planLabel.textContent = t("plan");
   elements.todayTokenLabel.textContent = t("todayTokens");
 
@@ -221,14 +239,14 @@ function render() {
     elements.statusText.title = "";
   }
 
-  elements.fiveHourPercent.textContent = typeof fiveHourPercent === "number" ? `${fiveHourPercent}%` : "--%";
-  elements.fiveHourFill.style.height = `${typeof fiveHourPercent === "number" ? fiveHourPercent : 0}%`;
-  elements.fiveHourMeter.dataset.level = fiveHourLevel;
-  elements.fiveHourMeter.setAttribute("aria-label", `${t("fiveHourRemaining")} ${elements.fiveHourPercent.textContent}, ${t("resetsIn")} ${fiveHourReset}`);
-  elements.weeklyPercent.textContent = typeof weeklyPercent === "number" ? `${weeklyPercent}%` : "--%";
-  elements.weeklyFill.style.height = `${typeof weeklyPercent === "number" ? weeklyPercent : 0}%`;
-  elements.weeklyMeter.dataset.level = weeklyLevel;
-  elements.weeklyMeter.setAttribute("aria-label", `${t("weeklyRemaining")} ${elements.weeklyPercent.textContent}, ${t("resetsIn")} ${weeklyReset}`);
+  elements.meterOnePercent.textContent = typeof meterOnePercent === "number" ? `${meterOnePercent}%` : "--%";
+  elements.meterOneFill.style.height = `${typeof meterOnePercent === "number" ? meterOnePercent : 0}%`;
+  elements.meterOne.dataset.level = meterOneLevel;
+  elements.meterOne.setAttribute("aria-label", `${t(meterOneSource === "none" ? "none" : `${meterOneSource}Remaining`)} ${elements.meterOnePercent.textContent}, ${t("resetsIn")} ${meterOneReset}`);
+  elements.meterTwoPercent.textContent = typeof meterTwoPercent === "number" ? `${meterTwoPercent}%` : "--%";
+  elements.meterTwoFill.style.height = `${typeof meterTwoPercent === "number" ? meterTwoPercent : 0}%`;
+  elements.meterTwo.dataset.level = meterTwoLevel;
+  elements.meterTwo.setAttribute("aria-label", `${t(meterTwoSource === "none" ? "none" : `${meterTwoSource}Remaining`)} ${elements.meterTwoPercent.textContent}, ${t("resetsIn")} ${meterTwoReset}`);
   elements.fiveHourCard.dataset.level = fiveHourLevel;
   elements.weeklyCard.dataset.level = weeklyLevel;
   elements.fiveHourText.textContent = formatWindow(quota?.fiveHour);
@@ -237,13 +255,20 @@ function render() {
   elements.todayTokenText.textContent = formatTokens(quota?.todayTokens);
   elements.todayTokenText.title = formatTokenTitle(quota?.todayTokens);
 
-  elements.liquidMeters.hidden = !state.displaySettings.showLiquid;
+  const meterOneVisible = meterOneSource !== "none";
+  const meterTwoVisible = meterTwoSource !== "none";
+  const hasMeters = meterOneVisible || meterTwoVisible;
+  elements.meterOne.hidden = !meterOneVisible;
+  elements.meterTwo.hidden = !meterTwoVisible;
+  elements.liquidMeters.hidden = !hasMeters;
+  elements.liquidMeters.classList.toggle("single-meter", meterOneVisible !== meterTwoVisible);
   elements.fiveHourCard.hidden = !state.displaySettings.showFiveHour;
   elements.weeklyCard.hidden = !state.displaySettings.showWeekly;
-  elements.content.classList.toggle("no-meter", !state.displaySettings.showLiquid);
+  elements.content.classList.toggle("no-meter", !hasMeters);
   elements.showFiveHourInput.checked = state.displaySettings.showFiveHour;
   elements.showWeeklyInput.checked = state.displaySettings.showWeekly;
-  elements.showLiquidInput.checked = state.displaySettings.showLiquid;
+  elements.meterOneSourceInput.value = meterOneSource;
+  elements.meterTwoSourceInput.value = meterTwoSource;
 }
 
 function loadDisplaySettings() {
@@ -262,7 +287,8 @@ function updateDisplaySettings() {
   state.displaySettings = window.WidgetLogic.normalizeDisplaySettings({
     showFiveHour: elements.showFiveHourInput.checked,
     showWeekly: elements.showWeeklyInput.checked,
-    showLiquid: elements.showLiquidInput.checked
+    meterOneSource: elements.meterOneSourceInput.value,
+    meterTwoSource: elements.meterTwoSourceInput.value
   });
   saveDisplaySettings();
   render();
@@ -377,7 +403,8 @@ function wireEvents() {
   });
   elements.showFiveHourInput.addEventListener("change", updateDisplaySettings);
   elements.showWeeklyInput.addEventListener("change", updateDisplaySettings);
-  elements.showLiquidInput.addEventListener("change", updateDisplaySettings);
+  elements.meterOneSourceInput.addEventListener("change", updateDisplaySettings);
+  elements.meterTwoSourceInput.addEventListener("change", updateDisplaySettings);
   document.addEventListener("pointerdown", (event) => {
     if (elements.settingsPanel.hidden) return;
     if (elements.settingsPanel.contains(event.target) || elements.settingsBtn.contains(event.target)) return;

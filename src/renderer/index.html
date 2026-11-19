@@ -53,38 +53,50 @@
           <span id="showWeeklyLabel">7天额度</span>
           <input id="showWeeklyInput" type="checkbox" checked />
         </label>
-        <label class="setting-row">
-          <span id="showLiquidLabel">水位显示</span>
-          <input id="showLiquidInput" type="checkbox" checked />
+        <label class="setting-row meter-source">
+          <span id="meterOneSettingLabel">Meter 1 shows</span>
+          <select id="meterOneSourceInput">
+            <option value="none">None</option>
+            <option value="weekly">7-day quota</option>
+            <option value="fiveHour">5-hour quota</option>
+          </select>
+        </label>
+        <label class="setting-row meter-source">
+          <span id="meterTwoSettingLabel">Meter 2 shows</span>
+          <select id="meterTwoSourceInput">
+            <option value="none">None</option>
+            <option value="weekly">7-day quota</option>
+            <option value="fiveHour">5-hour quota</option>
+          </select>
         </label>
       </aside>
 
       <section class="content">
         <div class="liquid-meters">
-          <div id="fiveHourMeter" class="liquid-meter" role="img" aria-label="5小时剩余">
+          <div id="meterOne" class="liquid-meter" role="img" aria-label="5小时剩余">
             <div class="glass-rim"></div>
-            <div id="fiveHourFill" class="liquid-fill">
+            <div id="meterOneFill" class="liquid-fill">
               <div class="wave wave-one"></div>
               <div class="wave wave-two"></div>
             </div>
             <div class="shine"></div>
             <div class="meter-copy">
-              <span id="fiveHourMeterLabel" class="meter-window-label">5小时</span>
-              <strong id="fiveHourPercent">--%</strong>
-              <span id="fiveHourReset" class="meter-reset">--</span>
+              <span id="meterOneLabel" class="meter-window-label">5小时</span>
+              <strong id="meterOnePercent">--%</strong>
+              <span id="meterOneReset" class="meter-reset">--</span>
             </div>
           </div>
-          <div id="weeklyMeter" class="liquid-meter" role="img" aria-label="7天剩余">
+          <div id="meterTwo" class="liquid-meter" role="img" aria-label="7天剩余">
             <div class="glass-rim"></div>
-            <div id="weeklyFill" class="liquid-fill">
+            <div id="meterTwoFill" class="liquid-fill">
               <div class="wave wave-one"></div>
               <div class="wave wave-two"></div>
             </div>
             <div class="shine"></div>
             <div class="meter-copy">
-              <span id="weeklyMeterLabel" class="meter-window-label">7天</span>
-              <strong id="weeklyPercent">--%</strong>
-              <span id="weeklyReset" class="meter-reset">--</span>
+              <span id="meterTwoLabel" class="meter-window-label">7天</span>
+              <strong id="meterTwoPercent">--%</strong>
+              <span id="meterTwoReset" class="meter-reset">--</span>
             </div>
           </div>
         </div>

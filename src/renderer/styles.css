@@ -219,7 +219,7 @@ button {
 .text-button:focus-visible,
 .panel-action:focus-visible,
 .setting-row input:focus-visible,
-.setting-source select:focus-visible {
+.meter-source select:focus-visible {
   outline: 2px solid rgba(var(--accent-rgb), 0.9);
   outline-offset: 1px;
 }
@@ -287,8 +287,7 @@ button {
   border-color: rgba(var(--accent-rgb), 0.3);
 }
 
-.setting-row,
-.setting-source {
+.setting-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -303,6 +302,17 @@ button {
   height: calc(12px * var(--ui-scale));
   margin: 0;
   accent-color: var(--accent);
+}
+
+.meter-source select {
+  width: calc(105px * var(--ui-scale));
+  height: calc(20px * var(--ui-scale));
+  padding: 0 calc(4px * var(--ui-scale));
+  color: var(--text);
+  background: #29323a;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: calc(6px * var(--ui-scale));
+  font: inherit;
 }
 
 .content {
@@ -327,6 +337,10 @@ button {
   gap: calc(5px * var(--ui-scale));
   min-width: 0;
   height: 100%;
+}
+
+.liquid-meters.single-meter {
+  grid-template-columns: 1fr;
 }
 
 .liquid-meter {
