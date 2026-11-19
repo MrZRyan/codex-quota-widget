@@ -23,7 +23,7 @@
 
 ## Release Download
 
-The latest stable release is `v1.4.1`, with Windows and Apple Silicon Mac packages in the same GitHub Release:
+The current source version is `v1.5.0`. The latest stable release is still `v1.4.1`, with Windows and Apple Silicon Mac packages in the same GitHub Release:
 
 [Download ChatGPT Quota v1.4.1](https://github.com/1nuYasha-cck/codex-quota-widget/releases/tag/v1.4.1)
 
@@ -121,7 +121,7 @@ npm run build
 The output executable is generated at:
 
 ```txt
-dist/ChatGPT-Quota-1.4.1-win-x64.exe
+dist/ChatGPT-Quota-1.5.0-win-x64.exe
 ```
 
 Build the Apple Silicon Mac package on macOS:

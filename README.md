@@ -38,7 +38,7 @@ ChatGPT Quota 是一个轻量级桌面工具，用来快速查看本机 Codex �
 
 ## Release 下载
 
-最新稳定版为 `v1.4.1`，Windows 与 Apple Silicon Mac 包位于同一个 GitHub Release：
+当前代码版本为 `v1.5.0`。最新稳定版仍为 `v1.4.1`，Windows 与 Apple Silicon Mac 包位于同一个 GitHub Release：
 
 [下载 ChatGPT Quota v1.4.1](https://github.com/1nuYasha-cck/codex-quota-widget/releases/tag/v1.4.1)
 
@@ -156,7 +156,7 @@ npm run build
 打包完成后，Windows 便携版会输出到：
 
 ```txt
-dist/ChatGPT-Quota-1.4.1-win-x64.exe
+dist/ChatGPT-Quota-1.5.0-win-x64.exe
 ```
 
 ### 打包 Apple Silicon Mac 版本
