@@ -6,12 +6,15 @@
   const DEFAULT_DISPLAY_SETTINGS = Object.freeze({
     showFiveHour: true,
     showWeekly: true,
+    showPlan: true,
+    showTodayTokens: true,
     meterOneSource: "fiveHour",
     meterTwoSource: "weekly",
     theme: "dark",
     barOrientation: "vertical",
     transparency: 0,
-    positionLocked: false
+    positionLocked: false,
+    minimalMode: false
   });
 
   function normalizeDisplaySettings(value) {
@@ -21,12 +24,15 @@
     return {
       showFiveHour: settings.showFiveHour !== false,
       showWeekly: settings.showWeekly !== false,
+      showPlan: settings.showPlan !== false,
+      showTodayTokens: settings.showTodayTokens !== false,
       meterOneSource: normalizeMeterSource(settings.meterOneSource, fallbackMeterSource || "fiveHour"),
       meterTwoSource: normalizeMeterSource(settings.meterTwoSource, fallbackMeterSource || "weekly"),
       theme: settings.theme === "light" ? "light" : "dark",
       barOrientation: settings.barOrientation === "horizontal" ? "horizontal" : "vertical",
       transparency: Number.isFinite(transparency) ? Math.round(Math.max(0, Math.min(100, transparency)) / 5) * 5 : 0,
-      positionLocked: settings.positionLocked === true
+      positionLocked: settings.positionLocked === true,
+      minimalMode: settings.minimalMode === true
     };
   }
 

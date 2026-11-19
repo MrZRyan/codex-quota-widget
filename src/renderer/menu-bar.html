@@ -32,29 +32,33 @@
         </button>
         <button id="refreshBtn" class="menu-row" type="button">
           <span class="row-icon refresh-icon" aria-hidden="true">↻</span>
-          <span>刷新额度</span>
+          <span id="refreshText">刷新额度</span>
         </button>
       </section>
 
       <fieldset class="settings-group source-group">
-        <legend>菜单栏百分比</legend>
+        <legend id="sourceLegend">菜单栏百分比</legend>
         <label class="menu-row option-row">
           <input type="radio" name="quotaSource" value="weekly" />
-          <span>7天</span>
+          <span id="weeklySourceLabel">7天</span>
         </label>
         <label class="menu-row option-row">
           <input type="radio" name="quotaSource" value="fiveHour" />
-          <span>5小时</span>
+          <span id="fiveHourSourceLabel">5小时</span>
         </label>
       </fieldset>
 
       <section class="settings-group">
+        <label class="menu-row option-row">
+          <input id="minimalModeInput" type="checkbox" />
+          <span id="minimalModeLabel">最简模式</span>
+        </label>
         <label class="menu-row option-row auto-launch-row">
           <input id="autoLaunchInput" type="checkbox" />
-          <span>开机自启动</span>
+          <span id="autoLaunchLabel">开机自启动</span>
         </label>
         <label class="menu-row select-row">
-          <span>刷新间隔</span>
+          <span id="refreshIntervalLabel">刷新间隔</span>
           <select id="refreshIntervalInput" aria-label="刷新间隔">
             <option value="1">1 分钟</option>
             <option value="5">5 分钟</option>
@@ -68,7 +72,7 @@
       <section class="action-list quit-group">
         <button id="quitBtn" class="menu-row quit-row" type="button">
           <span class="row-icon" aria-hidden="true">⏻</span>
-          <span>退出 ChatGPT Quota</span>
+          <span id="quitText">退出 ChatGPT Quota</span>
         </button>
       </section>
     </main>

@@ -17,6 +17,8 @@ let isAlwaysOnTop = true;
 let refreshIntervalMinutes = 5;
 let windowSize = { width: 260, height: 192 };
 let menuBarQuotaSource = DEFAULT_MENU_BAR_QUOTA_SOURCE;
+let trayLanguage = "zh";
+let isMinimalMode = false;
 let latestQuota = null;
 let isRefreshingMenuBar = false;
 let lastTrayClickAt = 0;
@@ -24,6 +26,30 @@ let saveWindowSizeTimer;
 
 const REFRESH_INTERVAL_OPTIONS = [1, 5, 15, 30, 60];
 const DEFAULT_REFRESH_INTERVAL_MINUTES = 5;
+const TRAY_TEXT = {
+  zh: {
+    toggleWidget: "显示/隐藏",
+    refresh: "刷新额度",
+    pin: "置顶",
+    unpin: "取消置顶",
+    minimalMode: "最简模式",
+    launchAtStartup: "开机自启动",
+    refreshInterval: "刷新间隔",
+    minutes: (value) => `${value} 分钟`,
+    quit: "退出"
+  },
+  en: {
+    toggleWidget: "Show / Hide",
+    refresh: "Refresh quota",
+    pin: "Pin on top",
+    unpin: "Unpin",
+    minimalMode: "Minimal mode",
+    launchAtStartup: "Launch at startup",
+    refreshInterval: "Refresh interval",
+    minutes: (value) => `${value} minutes`,
+    quit: "Quit"
+  }
+};
 
 app.setName("ChatGPT Quota");
 
@@ -159,31 +185,38 @@ function createTray() {
 
 function rebuildTrayMenu() {
   if (!tray || process.platform === "darwin") return;
+  const labels = TRAY_TEXT[trayLanguage];
   tray.setContextMenu(
     Menu.buildFromTemplate([
-      { label: "显示/隐藏", click: toggleWindow },
-      { label: "刷新额度", click: () => mainWindow?.webContents.send("quota:refresh") },
+      { label: labels.toggleWidget, click: toggleWindow },
+      { label: labels.refresh, click: () => mainWindow?.webContents.send("quota:refresh") },
       {
-        label: isAlwaysOnTop ? "取消置顶" : "置顶",
+        label: isAlwaysOnTop ? labels.unpin : labels.pin,
         click: () => setAlwaysOnTop(!isAlwaysOnTop)
       },
       {
-        label: "开机自启动",
+        label: labels.minimalMode,
+        type: "checkbox",
+        checked: isMinimalMode,
+        click: (item) => setMinimalMode(item.checked)
+      },
+      {
+        label: labels.launchAtStartup,
         type: "checkbox",
         checked: isAutoLaunchEnabled(),
         click: (item) => setAutoLaunch(item.checked)
       },
       {
-        label: "刷新间隔",
+        label: labels.refreshInterval,
         submenu: REFRESH_INTERVAL_OPTIONS.map((minutes) => ({
-          label: `${minutes} 分钟`,
+          label: labels.minutes(minutes),
           type: "radio",
           checked: refreshIntervalMinutes === minutes,
           click: () => setRefreshIntervalMinutes(minutes)
         }))
       },
       { type: "separator" },
-      { label: "退出", click: () => app.quit() }
+      { label: labels.quit, click: () => app.quit() }
     ])
   );
 }
@@ -198,10 +231,14 @@ function loadSettings() {
     refreshIntervalMinutes = normalizeRefreshInterval(settings.refreshIntervalMinutes);
     windowSize = normalizeWindowSize(settings.windowSize);
     menuBarQuotaSource = normalizeMenuBarQuotaSource(settings.menuBarQuotaSource);
+    trayLanguage = settings.language === "en" ? "en" : "zh";
+    isMinimalMode = settings.minimalMode === true;
   } catch {
     refreshIntervalMinutes = DEFAULT_REFRESH_INTERVAL_MINUTES;
     windowSize = { width: 260, height: 192 };
     menuBarQuotaSource = DEFAULT_MENU_BAR_QUOTA_SOURCE;
+    trayLanguage = "zh";
+    isMinimalMode = false;
   }
 }
 
@@ -212,7 +249,9 @@ function saveSettings() {
       {
         refreshIntervalMinutes,
         windowSize,
-        menuBarQuotaSource
+        menuBarQuotaSource,
+        language: trayLanguage,
+        minimalMode: isMinimalMode
       },
       null,
       2
@@ -241,6 +280,23 @@ function setRefreshIntervalMinutes(minutes) {
   rebuildTrayMenu();
   notifyMenuBarStateChanged();
   return refreshIntervalMinutes;
+}
+
+function setTrayLanguage(value) {
+  trayLanguage = value === "en" ? "en" : "zh";
+  saveSettings();
+  rebuildTrayMenu();
+  notifyMenuBarStateChanged();
+  return trayLanguage;
+}
+
+function setMinimalMode(value) {
+  isMinimalMode = Boolean(value);
+  saveSettings();
+  mainWindow?.webContents.send("settings:minimalModeChanged", isMinimalMode);
+  rebuildTrayMenu();
+  notifyMenuBarStateChanged();
+  return isMinimalMode;
 }
 
 function getAutoLaunchOptions() {
@@ -348,6 +404,8 @@ function getMenuBarState() {
     quotaSource: menuBarQuotaSource,
     autoLaunch: isAutoLaunchEnabled(),
     refreshIntervalMinutes,
+    language: trayLanguage,
+    minimalMode: isMinimalMode,
     widgetVisible: Boolean(mainWindow?.isVisible()),
     refreshing: isRefreshingMenuBar
   };
@@ -390,6 +448,9 @@ async function handleMenuBarAction(action, value) {
     case "set-refresh-interval":
       setRefreshIntervalMinutes(value);
       break;
+    case "set-minimal-mode":
+      setMinimalMode(Boolean(value));
+      break;
     case "quit":
       app.quit();
       return null;
@@ -411,6 +472,9 @@ app.whenReady().then(() => {
   });
   ipcMain.handle("settings:refreshInterval:get", () => refreshIntervalMinutes);
   ipcMain.handle("settings:refreshInterval:set", (_event, value) => setRefreshIntervalMinutes(value));
+  ipcMain.handle("settings:language:set", (_event, value) => setTrayLanguage(value));
+  ipcMain.handle("settings:minimalMode:get", () => isMinimalMode);
+  ipcMain.handle("settings:minimalMode:set", (_event, value) => setMinimalMode(value));
   ipcMain.handle("window:minimize", () => mainWindow?.hide());
   ipcMain.handle("window:close", () => {
     if (process.platform === "darwin") mainWindow?.hide();

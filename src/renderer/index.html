@@ -11,8 +11,8 @@
     <main class="widget">
       <header class="titlebar">
         <div class="brand">
-          <span id="trafficLight" class="traffic-light loading" aria-hidden="true"></span>
-          <div>
+          <span id="trafficLight" class="traffic-light loading" role="img" aria-label="读取中"></span>
+          <div class="brand-copy">
             <span id="brandName" class="brand-name">ChatGPT Quota</span>
             <span id="stateText" class="brand-state">读取中</span>
           </div>
@@ -50,6 +50,18 @@
         <label class="setting-row">
           <span id="showWeeklyLabel">7天额度</span>
           <input id="showWeeklyInput" type="checkbox" checked />
+        </label>
+        <label class="setting-row">
+          <span id="showPlanLabel">显示计划卡片</span>
+          <input id="showPlanInput" type="checkbox" checked />
+        </label>
+        <label class="setting-row">
+          <span id="showTodayTokensLabel">显示今日 Token 卡片</span>
+          <input id="showTodayTokensInput" type="checkbox" checked />
+        </label>
+        <label class="setting-row">
+          <span id="minimalModeLabel">最简模式</span>
+          <input id="minimalModeInput" type="checkbox" />
         </label>
         <label class="setting-row setting-select">
           <span id="meterOneSettingLabel">Meter 1 shows</span>
@@ -139,7 +151,7 @@
       </section>
 
       <footer class="status">
-        <span id="statusDot" class="status-dot loading"></span>
+        <span id="statusDot" class="status-dot loading" role="img" aria-label="正在刷新"></span>
         <span id="statusText">正在读取额度...</span>
       </footer>
     </main>

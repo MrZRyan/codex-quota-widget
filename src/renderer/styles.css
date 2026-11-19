@@ -89,6 +89,32 @@ button {
   -webkit-app-region: drag;
 }
 
+body[data-minimal-mode="true"] .titlebar {
+  min-height: calc(14px * var(--ui-scale));
+}
+
+body[data-minimal-mode="true"] .brand {
+  gap: 0;
+}
+
+body[data-minimal-mode="true"] .brand-copy,
+body[data-minimal-mode="true"] .window-actions,
+body[data-minimal-mode="true"] #statusText {
+  display: none;
+}
+
+body[data-minimal-mode="true"] .status {
+  position: absolute;
+  top: calc(17px * var(--ui-scale));
+  left: calc(25px * var(--ui-scale));
+  margin: 0;
+}
+
+.traffic-light[title],
+.status-dot[title] {
+  cursor: help;
+}
+
 body[data-position-locked="true"] .titlebar {
   -webkit-app-region: no-drag;
 }

@@ -28,6 +28,9 @@ const i18n = {
     settingsHint: "\u5feb\u6377\u64cd\u4f5c\u4e0e\u663e\u793a\u8bbe\u7f6e",
     showFiveHour: "5\u5c0f\u65f6\u989d\u5ea6",
     showWeekly: "7\u5929\u989d\u5ea6",
+    showPlanCard: "\u663e\u793a\u8ba1\u5212\u5361\u7247",
+    showTodayTokensCard: "\u663e\u793a\u4eca\u65e5 Token \u5361\u7247",
+    minimalMode: "\u6700\u7b80\u6a21\u5f0f",
     meterOneShows: "\u6c34\u4f4d 1 \u663e\u793a",
     meterTwoShows: "\u6c34\u4f4d 2 \u663e\u793a",
     none: "\u4e0d\u663e\u793a",
@@ -78,6 +81,9 @@ const i18n = {
     settingsHint: "Quick actions and display settings",
     showFiveHour: "5-hour quota",
     showWeekly: "7-day quota",
+    showPlanCard: "Show plan card",
+    showTodayTokensCard: "Show today's token card",
+    minimalMode: "Minimal mode",
     meterOneShows: "Meter 1 shows",
     meterTwoShows: "Meter 2 shows",
     none: "None",
@@ -127,6 +133,9 @@ const elements = {
   settingsHint: $("settingsHint"),
   showFiveHourLabel: $("showFiveHourLabel"),
   showWeeklyLabel: $("showWeeklyLabel"),
+  showPlanLabel: $("showPlanLabel"),
+  showTodayTokensLabel: $("showTodayTokensLabel"),
+  minimalModeLabel: $("minimalModeLabel"),
   meterOneSettingLabel: $("meterOneSettingLabel"),
   meterTwoSettingLabel: $("meterTwoSettingLabel"),
   themeLabel: $("themeLabel"),
@@ -135,6 +144,9 @@ const elements = {
   transparencyValue: $("transparencyValue"),
   showFiveHourInput: $("showFiveHourInput"),
   showWeeklyInput: $("showWeeklyInput"),
+  showPlanInput: $("showPlanInput"),
+  showTodayTokensInput: $("showTodayTokensInput"),
+  minimalModeInput: $("minimalModeInput"),
   meterOneSourceInput: $("meterOneSourceInput"),
   meterTwoSourceInput: $("meterTwoSourceInput"),
   themeInput: $("themeInput"),
@@ -179,6 +191,7 @@ function t(key) {
 function setLanguage(lang) {
   state.lang = lang;
   localStorage.setItem("codexQuotaLang", lang);
+  window.codexQuota.setLanguage(lang);
   render();
 }
 
@@ -218,6 +231,7 @@ function render() {
   elements.body.dataset.state = healthLevel;
   elements.body.dataset.theme = state.displaySettings.theme;
   elements.body.dataset.positionLocked = String(state.displaySettings.positionLocked);
+  elements.body.dataset.minimalMode = String(state.displaySettings.minimalMode);
   elements.widget.style.opacity = String(1 - state.displaySettings.transparency / 100);
   elements.brandName.textContent = "ChatGPT Quota";
   elements.stateText.textContent = state.error ? t("readFailed") : t("readNormal");
@@ -228,6 +242,9 @@ function render() {
   elements.settingsHint.textContent = t("settingsHint");
   elements.showFiveHourLabel.textContent = t("showFiveHour");
   elements.showWeeklyLabel.textContent = t("showWeekly");
+  elements.showPlanLabel.textContent = t("showPlanCard");
+  elements.showTodayTokensLabel.textContent = t("showTodayTokensCard");
+  elements.minimalModeLabel.textContent = t("minimalMode");
   elements.meterOneSettingLabel.textContent = t("meterOneShows");
   elements.meterTwoSettingLabel.textContent = t("meterTwoShows");
   elements.themeLabel.textContent = t("theme");
@@ -284,6 +301,13 @@ function render() {
   elements.todayTokenText.textContent = formatTokens(quota?.todayTokens);
   elements.todayTokenText.title = formatTokenTitle(quota?.todayTokens);
 
+  const readTooltip = state.loading ? t("loading") : state.error ? formatQuotaError(state.error) : t("readNormal");
+  const updateTooltip = quota?.fetchedAt ? `${t("statusReady")} ${formatTime(quota.fetchedAt)}` : t("noData");
+  elements.trafficLight.title = readTooltip;
+  elements.trafficLight.setAttribute("aria-label", readTooltip);
+  elements.statusDot.title = `${readTooltip} · ${updateTooltip}`;
+  elements.statusDot.setAttribute("aria-label", elements.statusDot.title);
+
   const meterOneVisible = meterOneSource !== "none";
   const meterTwoVisible = meterTwoSource !== "none";
   const hasMeters = meterOneVisible || meterTwoVisible;
@@ -295,10 +319,15 @@ function render() {
   elements.liquidMeters.classList.toggle("single-meter", meterOneVisible !== meterTwoVisible);
   elements.fiveHourCard.hidden = !state.displaySettings.showFiveHour;
   elements.weeklyCard.hidden = !state.displaySettings.showWeekly;
+  elements.planText.closest(".quota-card").hidden = !state.displaySettings.showPlan;
+  elements.todayTokenText.closest(".quota-card").hidden = !state.displaySettings.showTodayTokens;
   elements.content.classList.toggle("no-meter", !hasMeters);
   elements.content.classList.toggle("horizontal-layout", horizontalLayout);
   elements.showFiveHourInput.checked = state.displaySettings.showFiveHour;
   elements.showWeeklyInput.checked = state.displaySettings.showWeekly;
+  elements.showPlanInput.checked = state.displaySettings.showPlan;
+  elements.showTodayTokensInput.checked = state.displaySettings.showTodayTokens;
+  elements.minimalModeInput.checked = state.displaySettings.minimalMode;
   elements.meterOneSourceInput.value = meterOneSource;
   elements.meterTwoSourceInput.value = meterTwoSource;
   elements.themeInput.value = state.displaySettings.theme;
@@ -329,17 +358,25 @@ function saveDisplaySettings() {
 }
 
 function updateDisplaySettings() {
+  const previousMinimalMode = state.displaySettings.minimalMode;
   state.displaySettings = window.WidgetLogic.normalizeDisplaySettings({
     ...state.displaySettings,
     showFiveHour: elements.showFiveHourInput.checked,
     showWeekly: elements.showWeeklyInput.checked,
+    showPlan: elements.showPlanInput.checked,
+    showTodayTokens: elements.showTodayTokensInput.checked,
     meterOneSource: elements.meterOneSourceInput.value,
     meterTwoSource: elements.meterTwoSourceInput.value,
     theme: elements.themeInput.value,
     barOrientation: elements.orientationInput.value,
-    transparency: Number(elements.transparencyInput.value)
+    transparency: Number(elements.transparencyInput.value),
+    minimalMode: elements.minimalModeInput.checked
   });
   saveDisplaySettings();
+  if (state.displaySettings.minimalMode !== previousMinimalMode) {
+    window.codexQuota.setMinimalMode(state.displaySettings.minimalMode);
+    if (state.displaySettings.minimalMode) closeSettingsPanel();
+  }
   render();
 }
 
@@ -452,6 +489,9 @@ function wireEvents() {
   });
   elements.showFiveHourInput.addEventListener("change", updateDisplaySettings);
   elements.showWeeklyInput.addEventListener("change", updateDisplaySettings);
+  elements.showPlanInput.addEventListener("change", updateDisplaySettings);
+  elements.showTodayTokensInput.addEventListener("change", updateDisplaySettings);
+  elements.minimalModeInput.addEventListener("change", updateDisplaySettings);
   elements.meterOneSourceInput.addEventListener("change", updateDisplaySettings);
   elements.meterTwoSourceInput.addEventListener("change", updateDisplaySettings);
   elements.themeInput.addEventListener("change", updateDisplaySettings);
@@ -486,6 +526,15 @@ function wireEvents() {
     state.refreshIntervalMinutes = normalizeRefreshInterval(value);
     scheduleRefresh();
   });
+  window.codexQuota.onMinimalModeChanged((value) => {
+    state.displaySettings = window.WidgetLogic.normalizeDisplaySettings({
+      ...state.displaySettings,
+      minimalMode: value
+    });
+    saveDisplaySettings();
+    if (value) closeSettingsPanel();
+    render();
+  });
 }
 
 function updateUiScale() {
@@ -504,12 +553,19 @@ function closeSettingsPanel() {
 async function init() {
   updateUiScale();
   wireEvents();
-  const [alwaysOnTop, refreshIntervalMinutes] = await Promise.all([
+  const [alwaysOnTop, refreshIntervalMinutes, minimalMode] = await Promise.all([
     window.codexQuota.getAlwaysOnTop(),
-    window.codexQuota.getRefreshIntervalMinutes()
+    window.codexQuota.getRefreshIntervalMinutes(),
+    window.codexQuota.getMinimalMode()
   ]);
   state.alwaysOnTop = alwaysOnTop;
   state.refreshIntervalMinutes = normalizeRefreshInterval(refreshIntervalMinutes);
+  state.displaySettings = window.WidgetLogic.normalizeDisplaySettings({
+    ...state.displaySettings,
+    minimalMode
+  });
+  saveDisplaySettings();
+  await window.codexQuota.setLanguage(state.lang);
   render();
   refreshQuota();
   scheduleRefresh();
