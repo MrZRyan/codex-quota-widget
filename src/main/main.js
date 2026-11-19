@@ -46,6 +46,7 @@ function createWindow() {
     minHeight: 140,
     frame: false,
     transparent: true,
+    hasShadow: false,
     resizable: true,
     alwaysOnTop: isAlwaysOnTop,
     skipTaskbar: true,

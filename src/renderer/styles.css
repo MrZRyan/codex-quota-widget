@@ -44,12 +44,12 @@ button {
   width: 100vw;
   height: 100vh;
   padding: calc(8px * var(--ui-scale));
+  overflow: hidden;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
     var(--panel);
   border: 1px solid var(--line);
   border-radius: calc(16px * var(--ui-scale));
-  box-shadow: 0 calc(12px * var(--ui-scale)) calc(30px * var(--ui-scale)) rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(calc(8px * var(--ui-scale))) saturate(120%);
   user-select: none;
 }
