@@ -353,7 +353,6 @@ button {
   border-radius: calc(16px * var(--ui-scale)) calc(16px * var(--ui-scale)) calc(26px * var(--ui-scale)) calc(26px * var(--ui-scale));
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: inset 0 0 calc(16px * var(--ui-scale)) rgba(0, 0, 0, 0.3);
 }
 
 .glass-rim,
