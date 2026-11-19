@@ -471,16 +471,17 @@ body[data-position-locked="true"] .titlebar {
   position: absolute;
   left: calc(-20px * var(--ui-scale));
   right: calc(-20px * var(--ui-scale));
-  top: calc(-8px * var(--ui-scale));
-  height: calc(16px * var(--ui-scale));
-  border-radius: 42%;
+  top: calc(-9px * var(--ui-scale));
+  height: calc(18px * var(--ui-scale));
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0.4);
-  transform: translateX(calc(8px * var(--ui-scale)));
+  animation: water-wave 2.8s ease-in-out infinite alternate;
 }
 
 .wave-two {
-  opacity: 0.34;
-  transform: translateX(calc(-8px * var(--ui-scale)));
+  top: calc(-7px * var(--ui-scale));
+  opacity: 0.22;
+  animation-direction: alternate-reverse;
 }
 
 .liquid-meters[data-orientation="horizontal"] .wave {
@@ -490,11 +491,11 @@ body[data-position-locked="true"] .titlebar {
   left: auto;
   width: calc(16px * var(--ui-scale));
   height: auto;
-  transform: translateY(calc(8px * var(--ui-scale)));
+  animation-name: water-wave-horizontal;
 }
 
 .liquid-meters[data-orientation="horizontal"] .wave-two {
-  transform: translateY(calc(-8px * var(--ui-scale)));
+  animation-direction: alternate-reverse;
 }
 
 .meter-copy {
@@ -661,6 +662,26 @@ body[data-theme="light"] .meter-copy {
   }
 }
 
+@keyframes water-wave {
+  from {
+    transform: translateX(calc(-8px * var(--ui-scale))) rotate(-2deg);
+  }
+
+  to {
+    transform: translateX(calc(8px * var(--ui-scale))) rotate(2deg);
+  }
+}
+
+@keyframes water-wave-horizontal {
+  from {
+    transform: translateY(calc(-6px * var(--ui-scale))) rotate(-2deg);
+  }
+
+  to {
+    transform: translateY(calc(6px * var(--ui-scale))) rotate(2deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .traffic-light.loading,
   .status-dot.loading,
@@ -670,5 +691,9 @@ body[data-theme="light"] .meter-copy {
 
   .liquid-fill {
     transition: none;
+  }
+
+  .wave {
+    animation: none;
   }
 }
