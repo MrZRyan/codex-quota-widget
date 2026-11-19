@@ -13,6 +13,7 @@
   --warn: #f2b84b;
   --warn-rgb: 242, 184, 75;
   --settings-panel: rgba(18, 24, 30, 0.97);
+  --option-bg: #12181e;
   --settings-line: rgba(255, 255, 255, 0.1);
   --control-bg: rgba(255, 255, 255, 0.08);
   --control-line: rgba(255, 255, 255, 0.09);
@@ -28,6 +29,7 @@ body[data-theme="light"] {
   --accent: #12956d;
   --accent-rgb: 18, 149, 109;
   --settings-panel: rgba(247, 250, 251, 0.98);
+  --option-bg: #f7fafb;
   --settings-line: rgba(31, 50, 62, 0.14);
   --control-bg: rgba(31, 50, 62, 0.06);
   --control-line: rgba(31, 50, 62, 0.14);
@@ -316,6 +318,11 @@ body[data-position-locked="true"] .titlebar {
   border: 1px solid var(--control-line);
   border-radius: calc(6px * var(--ui-scale));
   font: inherit;
+}
+
+.setting-row select option {
+  color: var(--text);
+  background-color: var(--option-bg);
 }
 
 .setting-row input[type="range"] {
