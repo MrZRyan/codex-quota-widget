@@ -11,6 +11,7 @@ const i18n = {
     empty: "\u7528\u5c3d",
     error: "\u5931\u8d25",
     remaining: "\u5269\u4f59",
+    resetsIn: "\u91cd\u7f6e\u5012\u8ba1\u65f6",
     fiveHour: "5\u5c0f\u65f6",
     weekly: "7\u5929",
     plan: "\u8ba1\u5212",
@@ -49,6 +50,7 @@ const i18n = {
     empty: "Empty",
     error: "Failed",
     remaining: "Left",
+    resetsIn: "resets in",
     fiveHour: "5h",
     weekly: "7d",
     plan: "Plan",
@@ -117,10 +119,12 @@ const elements = {
   fiveHourFill: $("fiveHourFill"),
   fiveHourPercent: $("fiveHourPercent"),
   fiveHourMeterLabel: $("fiveHourMeterLabel"),
+  fiveHourReset: $("fiveHourReset"),
   weeklyMeter: $("weeklyMeter"),
   weeklyFill: $("weeklyFill"),
   weeklyPercent: $("weeklyPercent"),
   weeklyMeterLabel: $("weeklyMeterLabel"),
+  weeklyReset: $("weeklyReset"),
   fiveHourCard: $("fiveHourCard"),
   fiveHourLabel: $("fiveHourLabel"),
   fiveHourText: $("fiveHourText"),
@@ -167,6 +171,8 @@ function render() {
   const healthLevel = state.loading ? "loading" : state.error ? "error" : "ready";
   const fiveHourPercent = quota?.fiveHour?.remainingPercent;
   const weeklyPercent = quota?.weekly?.remainingPercent;
+  const fiveHourReset = formatTimeUntilReset(quota?.fiveHour?.resetsAt);
+  const weeklyReset = formatTimeUntilReset(quota?.weekly?.resetsAt);
   const fiveHourLevel = window.WidgetLogic.getLevel(fiveHourPercent, null, false);
   const weeklyLevel = window.WidgetLogic.getLevel(weeklyPercent, null, false);
 
@@ -185,6 +191,8 @@ function render() {
   elements.weeklyLabel.textContent = t("weekly");
   elements.fiveHourMeterLabel.textContent = t("fiveHour");
   elements.weeklyMeterLabel.textContent = t("weekly");
+  elements.fiveHourReset.textContent = fiveHourReset;
+  elements.weeklyReset.textContent = weeklyReset;
   elements.planLabel.textContent = t("plan");
   elements.todayTokenLabel.textContent = t("todayTokens");
 
@@ -216,11 +224,11 @@ function render() {
   elements.fiveHourPercent.textContent = typeof fiveHourPercent === "number" ? `${fiveHourPercent}%` : "--%";
   elements.fiveHourFill.style.height = `${typeof fiveHourPercent === "number" ? fiveHourPercent : 0}%`;
   elements.fiveHourMeter.dataset.level = fiveHourLevel;
-  elements.fiveHourMeter.setAttribute("aria-label", `${t("fiveHourRemaining")} ${elements.fiveHourPercent.textContent}`);
+  elements.fiveHourMeter.setAttribute("aria-label", `${t("fiveHourRemaining")} ${elements.fiveHourPercent.textContent}, ${t("resetsIn")} ${fiveHourReset}`);
   elements.weeklyPercent.textContent = typeof weeklyPercent === "number" ? `${weeklyPercent}%` : "--%";
   elements.weeklyFill.style.height = `${typeof weeklyPercent === "number" ? weeklyPercent : 0}%`;
   elements.weeklyMeter.dataset.level = weeklyLevel;
-  elements.weeklyMeter.setAttribute("aria-label", `${t("weeklyRemaining")} ${elements.weeklyPercent.textContent}`);
+  elements.weeklyMeter.setAttribute("aria-label", `${t("weeklyRemaining")} ${elements.weeklyPercent.textContent}, ${t("resetsIn")} ${weeklyReset}`);
   elements.fiveHourCard.dataset.level = fiveHourLevel;
   elements.weeklyCard.dataset.level = weeklyLevel;
   elements.fiveHourText.textContent = formatWindow(quota?.fiveHour);
@@ -273,6 +281,24 @@ function formatWindow(windowInfo, includeDate = false) {
   if (!windowInfo) return t("noData");
   const reset = windowInfo.resetsAt ? ` ${includeDate ? formatDateTime(windowInfo.resetsAt) : formatTime(windowInfo.resetsAt)}` : "";
   return `${windowInfo.remainingPercent}%${reset}`;
+}
+
+function formatTimeUntilReset(resetsAt) {
+  const timestamp = new Date(resetsAt).getTime();
+  if (!Number.isFinite(timestamp)) return t("noData");
+
+  const minutesLeft = Math.max(0, Math.ceil((timestamp - Date.now()) / 60_000));
+  const days = Math.floor(minutesLeft / 1_440);
+  const hours = Math.floor((minutesLeft % 1_440) / 60);
+  const minutes = minutesLeft % 60;
+  if (state.lang === "zh") {
+    if (days) return `${days}\u5929${hours}\u65f6`;
+    if (hours) return `${hours}\u65f6${minutes}\u5206`;
+    return `${minutes}\u5206`;
+  }
+  if (days) return `${days}d ${hours}h`;
+  if (hours) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
 }
 
 function formatTokens(todayTokens) {
@@ -403,6 +429,7 @@ async function init() {
   render();
   refreshQuota();
   scheduleRefresh();
+  setInterval(render, 60_000);
 }
 
 function scheduleRefresh() {

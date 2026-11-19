@@ -422,9 +422,20 @@ button {
 }
 
 .meter-copy span {
-  margin-top: calc(4px * var(--ui-scale));
   color: rgba(255, 255, 255, 0.78);
   font-size: calc(10px * var(--ui-scale));
+}
+
+.meter-copy .meter-window-label {
+  margin-bottom: calc(3px * var(--ui-scale));
+  font-size: calc(9px * var(--ui-scale));
+  line-height: 1;
+}
+
+.meter-copy .meter-reset {
+  margin-top: calc(2px * var(--ui-scale));
+  font-size: calc(8px * var(--ui-scale));
+  white-space: nowrap;
 }
 
 .quota-panel {
