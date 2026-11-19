@@ -160,6 +160,7 @@ const elements = {
   widget: document.querySelector(".widget"),
   content: document.querySelector(".content"),
   liquidMeters: document.querySelector(".liquid-meters"),
+  quotaPanel: document.querySelector(".quota-panel"),
   meterOne: $("meterOne"),
   meterOneFill: $("meterOneFill"),
   meterOnePercent: $("meterOnePercent"),
@@ -311,6 +312,11 @@ function render() {
   const meterOneVisible = meterOneSource !== "none";
   const meterTwoVisible = meterTwoSource !== "none";
   const hasMeters = meterOneVisible || meterTwoVisible;
+  const hasQuotaCards =
+    state.displaySettings.showFiveHour ||
+    state.displaySettings.showWeekly ||
+    state.displaySettings.showPlan ||
+    state.displaySettings.showTodayTokens;
   const horizontalLayout = state.displaySettings.barOrientation === "horizontal" && hasMeters;
   elements.liquidMeters.dataset.orientation = state.displaySettings.barOrientation;
   elements.meterOne.hidden = !meterOneVisible;
@@ -321,7 +327,10 @@ function render() {
   elements.weeklyCard.hidden = !state.displaySettings.showWeekly;
   elements.planText.closest(".quota-card").hidden = !state.displaySettings.showPlan;
   elements.todayTokenText.closest(".quota-card").hidden = !state.displaySettings.showTodayTokens;
+  elements.quotaPanel.hidden = !hasQuotaCards;
+  elements.quotaPanel.classList.toggle("single-secondary-card", state.displaySettings.showPlan !== state.displaySettings.showTodayTokens);
   elements.content.classList.toggle("no-meter", !hasMeters);
+  elements.content.classList.toggle("no-quota-cards", !hasQuotaCards);
   elements.content.classList.toggle("horizontal-layout", horizontalLayout);
   elements.showFiveHourInput.checked = state.displaySettings.showFiveHour;
   elements.showWeeklyInput.checked = state.displaySettings.showWeekly;

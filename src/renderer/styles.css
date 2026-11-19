@@ -382,6 +382,10 @@ body[data-position-locked="true"] .titlebar {
   grid-template-columns: 1fr;
 }
 
+.content.no-quota-cards:not(.horizontal-layout):not(.no-meter) {
+  grid-template-columns: 1fr;
+}
+
 .content.horizontal-layout {
   display: flex;
   flex-direction: column;
@@ -411,6 +415,16 @@ body[data-position-locked="true"] .titlebar {
 
 .liquid-meters[data-orientation="horizontal"].single-meter {
   grid-template-rows: calc(24px * var(--ui-scale));
+}
+
+.content.horizontal-layout.no-quota-cards .liquid-meters {
+  grid-template-rows: repeat(2, minmax(calc(24px * var(--ui-scale)), 1fr));
+  min-height: 0;
+  flex: 1 1 0;
+}
+
+.content.horizontal-layout.no-quota-cards .liquid-meters.single-meter {
+  grid-template-rows: minmax(calc(24px * var(--ui-scale)), 1fr);
 }
 
 .liquid-meter {
@@ -457,6 +471,10 @@ body[data-position-locked="true"] .titlebar {
   height: calc(24px * var(--ui-scale));
   min-height: calc(24px * var(--ui-scale));
   border-radius: calc(12px * var(--ui-scale));
+}
+
+.content.horizontal-layout.no-quota-cards .liquid-meter {
+  height: 100%;
 }
 
 .liquid-meters[data-orientation="horizontal"] .liquid-fill {
@@ -584,6 +602,11 @@ body[data-position-locked="true"] .titlebar {
 }
 
 .quota-card.primary {
+  grid-column: 1 / -1;
+}
+
+.quota-panel.single-secondary-card .quota-card.slim,
+.quota-panel.single-secondary-card .quota-card.token-card {
   grid-column: 1 / -1;
 }
 
