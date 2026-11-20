@@ -26,6 +26,8 @@ let saveWindowSizeTimer;
 
 const REFRESH_INTERVAL_OPTIONS = [1, 5, 15, 30, 60];
 const DEFAULT_REFRESH_INTERVAL_MINUTES = 5;
+const NORMAL_WINDOW_MIN_HEIGHT = 140;
+const MINIMAL_WINDOW_MIN_HEIGHT = 96;
 const TRAY_TEXT = {
   zh: {
     toggleWidget: "显示/隐藏",
@@ -69,7 +71,7 @@ function createWindow() {
     // Keep the compact layout usable while allowing the meter to be hidden
     // without leaving an unnecessarily large native window constraint.
     minWidth: 180,
-    minHeight: 140,
+    minHeight: isMinimalMode ? MINIMAL_WINDOW_MIN_HEIGHT : NORMAL_WINDOW_MIN_HEIGHT,
     frame: false,
     transparent: true,
     hasShadow: false,
@@ -229,10 +231,10 @@ function loadSettings() {
   try {
     const settings = JSON.parse(fs.readFileSync(getSettingsPath(), "utf8"));
     refreshIntervalMinutes = normalizeRefreshInterval(settings.refreshIntervalMinutes);
+    isMinimalMode = settings.minimalMode === true;
     windowSize = normalizeWindowSize(settings.windowSize);
     menuBarQuotaSource = normalizeMenuBarQuotaSource(settings.menuBarQuotaSource);
     trayLanguage = settings.language === "en" ? "en" : "zh";
-    isMinimalMode = settings.minimalMode === true;
   } catch {
     refreshIntervalMinutes = DEFAULT_REFRESH_INTERVAL_MINUTES;
     windowSize = { width: 260, height: 192 };
@@ -262,9 +264,10 @@ function saveSettings() {
 function normalizeWindowSize(value) {
   const width = Math.round(Number(value?.width));
   const height = Math.round(Number(value?.height));
+  const minHeight = isMinimalMode ? MINIMAL_WINDOW_MIN_HEIGHT : NORMAL_WINDOW_MIN_HEIGHT;
   return {
     width: Number.isFinite(width) ? Math.max(180, Math.min(width, 1600)) : 260,
-    height: Number.isFinite(height) ? Math.max(140, Math.min(height, 1200)) : 192
+    height: Number.isFinite(height) ? Math.max(minHeight, Math.min(height, 1200)) : 192
   };
 }
 
@@ -292,6 +295,15 @@ function setTrayLanguage(value) {
 
 function setMinimalMode(value) {
   isMinimalMode = Boolean(value);
+  if (mainWindow) {
+    const minHeight = isMinimalMode ? MINIMAL_WINDOW_MIN_HEIGHT : NORMAL_WINDOW_MIN_HEIGHT;
+    const { width, height } = mainWindow.getBounds();
+    mainWindow.setMinimumSize(180, minHeight);
+    if (height < minHeight) {
+      mainWindow.setSize(width, minHeight);
+      windowSize = { width, height: minHeight };
+    }
+  }
   saveSettings();
   mainWindow?.webContents.send("settings:minimalModeChanged", isMinimalMode);
   rebuildTrayMenu();
