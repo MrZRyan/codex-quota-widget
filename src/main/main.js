@@ -28,7 +28,7 @@ let saveWindowSizeTimer;
 const REFRESH_INTERVAL_OPTIONS = [1, 5, 15, 30, 60];
 const DEFAULT_REFRESH_INTERVAL_MINUTES = 5;
 const NORMAL_WINDOW_MIN_HEIGHT = 140;
-const MINIMAL_WINDOW_MIN_HEIGHT = 96;
+const MINIMAL_WINDOW_MIN_HEIGHT = 70;
 const TRAY_TEXT = {
   zh: {
     toggleWidget: "显示/隐藏",
