@@ -14,6 +14,7 @@ let mainWindow;
 let menuBarWindow;
 let tray;
 let isAlwaysOnTop = true;
+let isQuitting = false;
 let refreshIntervalMinutes = 5;
 let windowSize = { width: 260, height: 192 };
 let menuBarQuotaSource = DEFAULT_MENU_BAR_QUOTA_SOURCE;
@@ -96,6 +97,15 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, "../renderer/index.html"));
   mainWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   mainWindow.webContents.on("will-navigate", (event) => event.preventDefault());
+  mainWindow.on("close", (event) => {
+    if (isQuitting) return;
+    event.preventDefault();
+    if (process.platform === "darwin") mainWindow.hide();
+    else app.quit();
+  });
+  mainWindow.on("closed", () => {
+    if (mainWindow?.isDestroyed()) mainWindow = null;
+  });
   mainWindow.on("resize", () => {
     if (!mainWindow || mainWindow.isMaximized() || mainWindow.isMinimized()) return;
     const { width, height } = mainWindow.getBounds();
@@ -351,8 +361,9 @@ function setAlwaysOnTop(value) {
 }
 
 function toggleWindow() {
-  if (!mainWindow) return;
-  if (mainWindow.isVisible()) {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    createWindow();
+  } else if (mainWindow.isVisible()) {
     mainWindow.hide();
   } else {
     mainWindow.setSkipTaskbar(true);
@@ -509,6 +520,10 @@ app.whenReady().then(() => {
   });
 });
 
+app.on("before-quit", () => {
+  isQuitting = true;
+});
+
 app.on("window-all-closed", (event) => {
-  event.preventDefault();
+  if (!isQuitting) event.preventDefault();
 });
